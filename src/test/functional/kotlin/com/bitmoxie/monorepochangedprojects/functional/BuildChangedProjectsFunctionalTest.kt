@@ -7,25 +7,16 @@ import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import io.kotest.matchers.string.shouldNotContain
 import org.gradle.testkit.runner.TaskOutcome
-import java.io.File
 
 /**
  * Functional tests for the buildChangedProjects task.
  */
 class BuildChangedProjectsFunctionalTest : FunSpec({
-    lateinit var testProjectDir: File
-
-    beforeEach {
-        testProjectDir = kotlin.io.path.createTempDirectory("build-changed-test").toFile()
-    }
-
-    afterEach {
-        testProjectDir.deleteRecursively()
-    }
+    val functionalTest = listener(FunctionalTestListener())
 
     test("buildChangedProjects task builds only affected projects") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes only to common-lib
         project.appendToFile(Files.COMMON_LIB_SOURCE, "\n// Modified")
@@ -47,7 +38,7 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
 
     test("buildChangedProjects builds only affected apps when module changes") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes only to module1 (only app1 depends on it)
         project.appendToFile(Files.MODULE1_SOURCE, "\n// Modified")
@@ -66,7 +57,7 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
 
     test("buildChangedProjects reports no changes when nothing modified") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Don't make any changes
 
@@ -80,7 +71,7 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
 
     test("buildChangedProjects handles multiple independent app changes") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes to both apps
         project.appendToFile(Files.APP1_SOURCE, "\n// Modified A")
@@ -98,7 +89,7 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
 
     test("buildChangedProjects runs after detectChangedProjects") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         project.appendToFile(Files.MODULE2_SOURCE, "\n// Changed")
 
@@ -112,7 +103,7 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
 
     test("buildChangedProjects builds only leaf project when changed") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes only to app2
         project.appendToFile(Files.APP2_SOURCE, "\n// App changed")

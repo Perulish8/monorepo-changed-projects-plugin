@@ -8,26 +8,17 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.string.shouldContain
 import org.gradle.testkit.runner.TaskOutcome
-import java.io.File
 
 /**
  * Functional tests for the Monorepo Changed Projects plugin.
  * These tests create real Gradle projects, make git changes, and verify the plugin detects them correctly.
  */
 class MonorepoPluginFunctionalTest : FunSpec({
-    lateinit var testProjectDir: File
-
-    beforeEach {
-        testProjectDir = kotlin.io.path.createTempDirectory("monorepo-plugin-test").toFile()
-    }
-
-    afterEach {
-        testProjectDir.deleteRecursively()
-    }
+    val functionalTest = listener(FunctionalTestListener())
 
     test("plugin detects changed library and all dependent projects") {
         // Setup: Standard project structure
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes to common-lib
         project.appendToFile(Files.COMMON_LIB_SOURCE, "\n// Added comment")
@@ -55,7 +46,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin detects changed module and only its dependent apps") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes only to module1
         project.appendToFile(Files.MODULE1_SOURCE, "\n// Modified module1")
@@ -73,7 +64,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin detects changed module2 affecting both apps") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes to module2 (which both apps depend on)
         project.appendToFile(Files.MODULE2_SOURCE, "\n// Modified module2")
@@ -91,7 +82,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin detects only leaf project when changed") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes only to app1 (leaf project)
         project.appendToFile(Files.APP1_SOURCE, "\n// Modified app")
@@ -109,7 +100,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin detects no changes when nothing modified") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Don't make any changes
 
@@ -127,7 +118,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin detects multiple independent app changes") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes to both apps (independent changes)
         project.appendToFile(Files.APP1_SOURCE, "\n// Modified app1")
@@ -146,7 +137,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin detects untracked files when includeUntracked is true") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Create a new untracked file in common-lib
         project.createNewFile("common-lib/src/main/kotlin/com/example/NewFile.kt",
@@ -176,7 +167,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin detects staged but uncommitted changes") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make and stage changes to module1
         project.appendToFile(Files.MODULE1_SOURCE, "\n// Staged change")
@@ -194,7 +185,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin works with build.gradle.kts changes") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Modify build file
         project.appendToFile(Files.MODULE2_BUILD, "\n// Build config change")
@@ -211,7 +202,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
 
     test("plugin detects changes with :apps prefix") {
         // Setup
-        val project = StandardTestProject.createAndInitialize(testProjectDir)
+        val project = functionalTest.createStandardProject()
 
         // Make changes to module2 (affects both apps)
         project.appendToFile(Files.MODULE2_SOURCE, "\n// Changed")
@@ -228,5 +219,7 @@ class MonorepoPluginFunctionalTest : FunSpec({
         changedApps shouldContainAll setOf(Projects.APP1, Projects.APP2)
     }
 })
+
+
 
 
