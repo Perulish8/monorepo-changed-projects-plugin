@@ -23,7 +23,7 @@ import java.io.File
  * })
  * ```
  */
-class FunctionalTestListener : TestListener {
+class TestProjectListener : TestListener {
 
     private var currentTestDir: File? = null
 
