@@ -185,6 +185,31 @@ if (exitCode == 0) {
 ./gradlew publishToMavenLocal
 ```
 
+## CI/CD
+
+GitHub Actions workflows are configured in `.github/workflows/`:
+
+- **ci.yml**: Main CI pipeline that runs on every push and PR
+  - Tests on multiple OS (Ubuntu, macOS, Windows) and Java versions (11, 17, 21)
+  - Runs unit and functional tests
+  - Validates plugin descriptor
+  - Uploads test reports as artifacts
+  
+- **release.yml**: Release workflow triggered by version tags
+  - Creates GitHub releases
+  - Attaches built JAR artifacts
+  - Ready to publish to Gradle Plugin Portal (commented out)
+  
+- **dependabot.yml**: Automated dependency updates for GitHub Actions and Gradle dependencies
+
+### Creating a Release
+
+1. Update version in `build.gradle.kts`
+2. Update `CHANGELOG.md`
+3. Commit changes
+4. Create and push a tag: `git tag v1.0.0 && git push origin v1.0.0`
+5. GitHub Actions will automatically create a release
+
 ## When Adding New Features
 
 1. **Write tests first** using Kotest FunSpec style

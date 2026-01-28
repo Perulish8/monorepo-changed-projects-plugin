@@ -1,5 +1,7 @@
 # Monorepo Changed Projects Plugin
 
+[![CI](https://github.com/bitmoxie/monorepo-changed-projects-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/bitmoxie/monorepo-changed-projects-plugin/actions/workflows/ci.yml)
+
 A Gradle plugin designed to optimize build times in large multi-module Gradle projects and monorepos by detecting which projects have changed based on git history.
 
 ## Overview
