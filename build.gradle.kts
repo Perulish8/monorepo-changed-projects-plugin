@@ -14,9 +14,9 @@ repositories {
 
 dependencies {
     implementation(kotlin("stdlib"))
-    testImplementation("io.kotest:kotest-runner-junit5:5.8.0")
-    testImplementation("io.kotest:kotest-assertions-core:5.8.0")
-    testImplementation("io.kotest:kotest-property:5.8.0")
+    testImplementation("io.kotest:kotest-runner-junit5:6.1.2")
+    testImplementation("io.kotest:kotest-assertions-core:6.1.2")
+    testImplementation("io.kotest:kotest-property:6.1.2")
 }
 
 // Configure source sets for unit and functional tests
@@ -47,14 +47,14 @@ sourceSets {
 // Add dependencies for the test source sets
 dependencies {
     // Unit test dependencies
-    add("unitTestImplementation", "io.kotest:kotest-runner-junit5:5.8.0")
-    add("unitTestImplementation", "io.kotest:kotest-assertions-core:5.8.0")
-    add("unitTestImplementation", "io.kotest:kotest-property:5.8.0")
+    add("unitTestImplementation", "io.kotest:kotest-runner-junit5:6.1.2")
+    add("unitTestImplementation", "io.kotest:kotest-assertions-core:6.1.2")
+    add("unitTestImplementation", "io.kotest:kotest-property:6.1.2")
 
     // Functional test dependencies
     add("functionalTestImplementation", gradleTestKit())
-    add("functionalTestImplementation", "io.kotest:kotest-runner-junit5:5.8.0")
-    add("functionalTestImplementation", "io.kotest:kotest-assertions-core:5.8.0")
+    add("functionalTestImplementation", "io.kotest:kotest-runner-junit5:6.1.2")
+    add("functionalTestImplementation", "io.kotest:kotest-assertions-core:6.1.2")
 }
 
 // Register unit test task
