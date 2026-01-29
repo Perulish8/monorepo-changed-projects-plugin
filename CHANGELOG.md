@@ -9,6 +9,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### Fixed
 - **Windows path separator compatibility** - Fixed `ProjectFileMapper` to normalize path separators on Windows, ensuring nested projects like `:apps:app2` are correctly identified instead of just their parent directory `:apps`
+- **Windows test name compatibility** - Fixed `TestProjectListener` to sanitize test names before using them in temporary directory paths, preventing `InvalidPathException` on Windows when test names contain illegal path characters like colons
 
 ### BREAKING CHANGES
 - **Project renamed** from `projects-changed-plugin` to `monorepo-changed-projects-plugin`
