@@ -38,7 +38,7 @@ This dramatically reduces build times in CI/CD pipelines by avoiding unnecessary
 
 ```kotlin
 plugins {
-    id("com.bitmoxie.monorepo-changed-projects") version "1.0.0"
+    id("com.bitmoxie.monorepo-changed-projects-plugin") version "1.0.0"
 }
 ```
 

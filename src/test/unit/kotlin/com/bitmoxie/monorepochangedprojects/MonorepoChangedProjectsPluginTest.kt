@@ -13,7 +13,7 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
         val project = ProjectBuilder.builder().build()
 
         // when
-        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects")
+        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects-plugin")
 
         // then
         val task = project.tasks.findByName("detectChangedProjects")
@@ -26,7 +26,7 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
         val project = ProjectBuilder.builder().build()
 
         // when
-        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects")
+        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects-plugin")
 
         // then
         val extension = project.extensions.findByName("projectsChanged")
@@ -37,7 +37,7 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
     test("extension has correct defaults") {
         // given
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects")
+        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects-plugin")
 
         // when
         val extension = project.extensions.getByType(ProjectsChangedExtension::class.java)
@@ -51,7 +51,7 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
     test("extension can be configured") {
         // given
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects")
+        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects-plugin")
         val extension = project.extensions.getByType(ProjectsChangedExtension::class.java)
 
         // when
@@ -68,7 +68,7 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
     test("task has correct group and description") {
         // given
         val project = ProjectBuilder.builder().build()
-        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects")
+        project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects-plugin")
 
         // when
         val task = project.tasks.findByName("detectChangedProjects")
@@ -86,7 +86,7 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
             val project = ProjectBuilder.builder()
                 .withProjectDir(tempDir)
                 .build()
-            project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects")
+            project.pluginManager.apply("com.bitmoxie.monorepo-changed-projects-plugin")
             val task = project.tasks.findByName("detectChangedProjects") as DetectChangedProjectsTask
 
             // when

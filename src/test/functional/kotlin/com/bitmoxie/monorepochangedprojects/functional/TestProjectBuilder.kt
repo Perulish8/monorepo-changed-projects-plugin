@@ -30,7 +30,7 @@ class TestProjectBuilder(private val projectDir: File) {
         return this
     }
 
-    fun applyPlugin(pluginId: String = "com.bitmoxie.monorepo-changed-projects"): TestProjectBuilder {
+    fun applyPlugin(pluginId: String = "com.bitmoxie.monorepo-changed-projects-plugin"): TestProjectBuilder {
         pluginApplied = true
         return this
     }
@@ -46,7 +46,7 @@ class TestProjectBuilder(private val projectDir: File) {
         val rootBuild = if (pluginApplied) {
             """
             plugins {
-                id("com.bitmoxie.monorepo-changed-projects")
+                id("com.bitmoxie.monorepo-changed-projects-plugin")
             }
             
             projectsChanged {

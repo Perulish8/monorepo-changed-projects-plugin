@@ -2,7 +2,7 @@
 // Place this in your root build.gradle.kts
 
 plugins {
-    id("com.bitmoxie.monorepo-changed-projects") version "1.0.0"
+    id("com.bitmoxie.monorepo-changed-projects-plugin") version "1.0.0"
 }
 
 projectsChanged {

@@ -7,7 +7,7 @@ Your plugin is now configured and ready to publish! Here's what's already in pla
 ### Build Configuration ✅
 - [x] Plugin Publish plugin added (`com.gradle.plugin-publish` v1.3.0)
 - [x] Plugin metadata configured (website, vcsUrl, tags)
-- [x] Plugin ID: `com.bitmoxie.monorepo-changed-projects`
+- [x] Plugin ID: `com.bitmoxie.monorepo-changed-projects-plugin`
 - [x] Group: `com.bitmoxie`
 - [x] Version: `1.0.0` (in build.gradle.kts)
 
@@ -168,7 +168,7 @@ Before your first release, verify:
 ## 📦 After Publishing
 
 ### Verify Publication
-1. Check https://plugins.gradle.org/plugin/com.bitmoxie.monorepo-changed-projects
+1. Check https://plugins.gradle.org/plugin/com.bitmoxie.monorepo-changed-projects-plugin
 2. Verify version, description, and metadata
 3. Check that the "Read More" link points to your GitHub repo
 
@@ -185,7 +185,7 @@ pluginManagement {
 
 // build.gradle.kts
 plugins {
-    id("com.bitmoxie.monorepo-changed-projects") version "1.0.0"
+    id("com.bitmoxie.monorepo-changed-projects-plugin") version "1.0.0"
 }
 
 projectsChanged {
@@ -202,7 +202,7 @@ projectsChanged {
 Add to README.md:
 
 ```markdown
-[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.bitmoxie.monorepo-changed-projects?logo=gradle)](https://plugins.gradle.org/plugin/com.bitmoxie.monorepo-changed-projects)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/com.bitmoxie.monorepo-changed-projects-plugin?logo=gradle)](https://plugins.gradle.org/plugin/com.bitmoxie.monorepo-changed-projects-plugin)
 ```
 
 ### Announce Your Plugin

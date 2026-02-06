@@ -22,6 +22,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI configuration** - Removed Java 11 support (now supporting Java 17 and 21 only)
 - **CI configuration** - Removed Windows runners temporarily (now testing on Ubuntu and macOS only)
 - **Plugin metadata** - Enhanced `gradlePlugin` configuration with website, vcsUrl, and tags for better Plugin Portal presentation
+- **Plugin ID** - Updated from `com.bitmoxie.monorepo-changed-projects` to `com.bitmoxie.monorepo-changed-projects-plugin` for clarity
 
 ### Fixed
 - **Windows path separator compatibility** - Fixed `ProjectFileMapper` to normalize path separators on Windows, ensuring nested projects like `:apps:app2` are correctly identified instead of just their parent directory `:apps`
@@ -30,7 +31,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### BREAKING CHANGES
 - **Project renamed** from `projects-changed-plugin` to `monorepo-changed-projects-plugin`
-- **Plugin ID changed** from `com.bitmoxie.projects-changed` to `com.bitmoxie.monorepo-changed-projects`
+- **Plugin ID changed** from `com.bitmoxie.projects-changed` to `com.bitmoxie.monorepo-changed-projects-plugin`
 - **Package renamed** from `com.bitmoxie.projectschanged` to `com.bitmoxie.monorepochangedprojects`
 - **Main class renamed** from `ProjectsChangedPlugin` to `MonorepoChangedProjectsPlugin`
 - **Migrated tests** from JUnit to Kotest
