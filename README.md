@@ -1,6 +1,6 @@
 # Monorepo Changed Projects Plugin
 
-[![CI](https://github.com/perulish8/monorepo-changed-projects-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/perulish8/monorepo-changed-projects-plugin/actions/workflows/ci.yml)
+[![CI](https://github.com/doug-hawley/monorepo-changed-projects-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/doug-hawley/monorepo-changed-projects-plugin/actions/workflows/ci.yml)
 
 A Gradle plugin designed to optimize build times in large multi-module Gradle projects and monorepos by detecting which projects have changed based on git history.
 
@@ -38,11 +38,11 @@ This dramatically reduces build times in CI/CD pipelines by avoiding unnecessary
 
 ```kotlin
 plugins {
-    id("io.github.perulish8.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
 }
 ```
 
-> **Note:** This plugin uses a GitHub-based plugin ID (`io.github.perulish8`) which simplifies verification on the Gradle Plugin Portal without requiring domain ownership.
+> **Note:** This plugin uses a GitHub-based plugin ID (`io.github.doug-hawley`) which simplifies verification on the Gradle Plugin Portal without requiring domain ownership.
 
 ### Configure the plugin
 
@@ -109,7 +109,7 @@ tasks.register("showChangedFiles") {
         }
         
         // Get enhanced metadata with dependencies and changed files
-        val metadataMap = project.extensions.extraProperties.get("changedProjectsMetadata") as Map<String, com.bitmoxie.monorepochangedprojects.domain.ProjectMetadata>
+        val metadataMap = project.extensions.extraProperties.get("changedProjectsMetadata") as Map<String, io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata>
         
         metadataMap.values.forEach { metadata ->
             // hasChanges() returns true if project has direct changes OR dependency changes
@@ -129,8 +129,8 @@ tasks.register("showChangedFiles") {
 The plugin provides a `ChangedProjects` domain object for convenient access to changed project information:
 
 ```kotlin
-import com.bitmoxie.monorepochangedprojects.domain.ChangedProjects
-import com.bitmoxie.monorepochangedprojects.domain.ProjectMetadata
+import io.github.doughawley.monorepochangedprojects.domain.ChangedProjects
+import io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata
 
 tasks.register("analyzeWithChangedProjects") {
     dependsOn("detectChangedProjects")
@@ -189,7 +189,7 @@ For a multi-module project, the plugin can determine which subprojects are affec
 ```kotlin
 // In root build.gradle.kts
 plugins {
-    id("io.github.perulish8.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
 }
 
 projectsChanged {
@@ -249,8 +249,8 @@ tasks.register("ciTest") {
 Use prefix filtering to build only changed applications:
 
 ```kotlin
-import com.bitmoxie.monorepochangedprojects.domain.ChangedProjects
-import com.bitmoxie.monorepochangedprojects.domain.ProjectMetadata
+import io.github.doughawley.monorepochangedprojects.domain.ChangedProjects
+import io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata
 
 tasks.register("buildChangedApps") {
     dependsOn("detectChangedProjects")
@@ -386,9 +386,9 @@ This is expected if files in the root directory (outside of subproject directori
 
 ## Support & Contributions
 
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/perulish8/monorepo-changed-projects-plugin/issues)
+- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/doug-hawley/monorepo-changed-projects-plugin/issues)
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines
-- **Questions**: Start a discussion in [GitHub Discussions](https://github.com/perulish8/monorepo-changed-projects-plugin/discussions)
+- **Questions**: Start a discussion in [GitHub Discussions](https://github.com/doug-hawley/monorepo-changed-projects-plugin/discussions)
 
 ## License
 

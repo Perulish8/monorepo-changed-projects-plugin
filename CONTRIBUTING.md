@@ -24,7 +24,7 @@ Thank you for your interest in contributing! This document provides guidelines a
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/perulish8/monorepo-changed-projects-plugin.git
+git clone https://github.com/doug-hawley/monorepo-changed-projects-plugin.git
 cd monorepo-changed-projects-plugin
 ```
 
@@ -320,7 +320,7 @@ repositories {
 }
 
 plugins {
-    id("io.github.perulish8.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
 }
 ```
 
@@ -374,8 +374,8 @@ git diff --staged --name-only
 
 ## Need Help?
 
-- **Questions**: Open a [GitHub Discussion](https://github.com/perulish8/monorepo-changed-projects-plugin/discussions)
-- **Bugs**: Report via [GitHub Issues](https://github.com/perulish8/monorepo-changed-projects-plugin/issues)
+- **Questions**: Open a [GitHub Discussion](https://github.com/doug-hawley/monorepo-changed-projects-plugin/discussions)
+- **Bugs**: Report via [GitHub Issues](https://github.com/doug-hawley/monorepo-changed-projects-plugin/issues)
 - **Documentation**: Check [copilot-instructions.md](copilot-instructions.md) for architecture details
 
 ## License

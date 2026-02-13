@@ -13,6 +13,7 @@ Gradle plugin in Kotlin that detects changed projects based on git history for o
 - **Minimal documentation**: Only update README.md and CHANGELOG.md as needed
 - **No status reports**: Don't create migration guides, scan reports, or summary files
 - **Let the code speak**: Use clear naming and KDoc instead of separate documentation files
+- **No completion files**: Never create files like `USERNAME_UPDATE_COMPLETE.md`, `SUMMARY.md`, or similar status/summary files at the end of tasks. Use the show_content tool to display summaries to the user instead.
 
 ## Code Style and Standards
 
@@ -113,11 +114,11 @@ class MyFeatureTest : FunSpec({
 
 ```
 src/
-├── main/kotlin/com/bitmoxie/monorepochangedprojects/
+├── main/kotlin/io/github/doughawley/monorepochangedprojects/
 │   ├── MonorepoChangedProjectsPlugin.kt    # Main plugin entry point
 │   ├── DetectChangedProjectsTask.kt        # Core task implementation
 │   └── ProjectsChangedExtension.kt         # Configuration DSL
-└── test/kotlin/com/bitmoxie/monorepochangedprojects/
+└── test/kotlin/io/github/doughawley/monorepochangedprojects/
     └── MonorepoChangedProjectsPluginTest.kt    # Kotest-based tests
 ```
 
@@ -240,8 +241,8 @@ When functional tests fail, **always check the test results XML files** for deta
 **Location:** `build/test-results/functionalTest/`
 
 Key files:
-- `TEST-com.bitmoxie.monorepochangedprojects.functional.MonorepoPluginFunctionalTest.xml` - Core plugin tests
-- `TEST-com.bitmoxie.monorepochangedprojects.functional.BuildChangedProjectsFunctionalTest.xml` - Build task tests
+- `TEST-io.github.doughawley.monorepochangedprojects.functional.MonorepoPluginFunctionalTest.xml` - Core plugin tests
+- `TEST-io.github.doughawley.monorepochangedprojects.functional.BuildChangedProjectsFunctionalTest.xml` - Build task tests
 
 These XML files contain:
 - Full error messages and assertions

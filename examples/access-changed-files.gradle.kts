@@ -2,7 +2,7 @@
 // Place this in your root build.gradle.kts
 
 plugins {
-    id("io.github.perulish8.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
 }
 
 projectsChanged {
@@ -41,7 +41,7 @@ tasks.register("analyzeChanges") {
     dependsOn("detectChangedProjects")
     doLast {
         val metadataMap = project.extensions.extraProperties
-            .get("changedProjectsMetadata") as Map<String, com.bitmoxie.monorepochangedprojects.domain.ProjectMetadata>
+            .get("changedProjectsMetadata") as Map<String, io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata>
 
         println("Detailed change analysis:")
         metadataMap.values
@@ -94,7 +94,7 @@ tasks.register("impactReport") {
     dependsOn("detectChangedProjects")
     doLast {
         val metadataMap = project.extensions.extraProperties
-            .get("changedProjectsMetadata") as Map<String, com.bitmoxie.monorepochangedprojects.domain.ProjectMetadata>
+            .get("changedProjectsMetadata") as Map<String, io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata>
 
         val report = StringBuilder()
         report.appendLine("=" .repeat(80))

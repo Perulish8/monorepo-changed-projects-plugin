@@ -2,9 +2,9 @@
 
 ## ✅ Plugin ID Updated
 
-Your plugin ID has been changed to: **`io.github.perulish8.monorepo-changed-projects-plugin`**
+Your plugin ID has been changed to: **`io.github.doug-hawley.monorepo-changed-projects-plugin`**
 
-This uses your GitHub username (`perulish8`) and follows the recommended `io.github.username` format.
+This uses your GitHub username (`doug-hawley`) and follows the recommended `io.github.username` format.
 
 ---
 
@@ -15,7 +15,7 @@ This uses your GitHub username (`perulish8`) and follows the recommended `io.git
 The Gradle Plugin Portal requires public repositories.
 
 **Steps:**
-1. Go to: https://github.com/perulish8/monorepo-changed-projects-plugin/settings
+1. Go to: https://github.com/doug-hawley/monorepo-changed-projects-plugin/settings
 2. Scroll down to **"Danger Zone"** at the bottom
 3. Click **"Change visibility"**
 4. Select **"Make public"**
@@ -23,7 +23,7 @@ The Gradle Plugin Portal requires public repositories.
 
 ### 2. Link GitHub Account to Plugin Portal
 
-This proves you own the GitHub username `perulish8`.
+This proves you own the GitHub username `doug-hawley`.
 
 **Steps:**
 1. Go to: https://plugins.gradle.org/
@@ -31,11 +31,11 @@ This proves you own the GitHub username `perulish8`.
 3. Go to your profile settings
 4. Look for **"Connected Accounts"** or **"GitHub Integration"**
 5. Click **"Link GitHub Account"** or **"Connect GitHub"**
-6. Authorize the connection to your `perulish8` GitHub account
+6. Authorize the connection to your `doug-hawley` GitHub account
 
 **Why this works:**
-- Plugin ID: `io.github.perulish8.*`
-- Your linked GitHub: `perulish8`
+- Plugin ID: `io.github.doug-hawley.*`
+- Your linked GitHub: `doug-hawley`
 - ✅ Ownership verified automatically!
 
 ---
@@ -45,17 +45,17 @@ This proves you own the GitHub username `perulish8`.
 Before resubmitting, verify:
 
 ### Repository
-- [ ] Repository is **public** (https://github.com/perulish8/monorepo-changed-projects-plugin)
+- [ ] Repository is **public** (https://github.com/doug-hawley/monorepo-changed-projects-plugin)
 - [ ] Repository has a README with usage instructions
 - [ ] Repository has a LICENSE file
 - [ ] VCS URL in build.gradle.kts is correct
 
 ### Plugin Portal Account
-- [ ] GitHub account `perulish8` is linked to Plugin Portal account
+- [ ] GitHub account `doug-hawley` is linked to Plugin Portal account
 - [ ] You can see the linked GitHub username in your profile
 
 ### Build Configuration
-- [x] Plugin ID updated to `io.github.perulish8.monorepo-changed-projects-plugin`
+- [x] Plugin ID updated to `io.github.doug-hawley.monorepo-changed-projects-plugin`
 - [x] VCS URL points to public repository
 - [x] Website URL is correct
 - [x] Plugin has proper display name and description
@@ -77,7 +77,7 @@ Once the above steps are complete:
 1. Commit these changes with a conventional commit:
    ```bash
    git add .
-   git commit -m "fix: update plugin ID to use GitHub-based namespace (io.github.perulish8)"
+   git commit -m "fix: update plugin ID to use GitHub-based namespace (io.github.doug-hawley)"
    git push origin main
    ```
 
@@ -89,7 +89,7 @@ Once the above steps are complete:
 1. Commit and push changes:
    ```bash
    git add .
-   git commit -m "Update plugin ID to io.github.perulish8.monorepo-changed-projects-plugin"
+   git commit -m "Update plugin ID to io.github.doug-hawley.monorepo-changed-projects-plugin"
    git push origin main
    ```
 
@@ -136,7 +136,7 @@ Issue: Repository not public
 
 ### After (Ready to Approve)
 ```
-Plugin ID: io.github.perulish8.monorepo-changed-projects-plugin
+Plugin ID: io.github.doug-hawley.monorepo-changed-projects-plugin
 Verification: GitHub account linking (automatic)
 Repository: Public (once you change visibility)
 ```
@@ -152,13 +152,13 @@ Run these commands to ensure everything is correct:
 ./gradlew validatePlugins
 
 # Check that plugin ID is correct
-grep -r "io.github.perulish8" build.gradle.kts
+grep -r "io.github.doug-hawley" build.gradle.kts
 
 # Build and test
 ./gradlew clean build
 
 # Check generated plugin descriptor
-cat build/pluginDescriptors/io.github.perulish8.monorepo-changed-projects-plugin.properties
+cat build/pluginDescriptors/io.github.doug-hawley.monorepo-changed-projects-plugin.properties
 ```
 
 ---
@@ -167,7 +167,7 @@ cat build/pluginDescriptors/io.github.perulish8.monorepo-changed-projects-plugin
 
 ### "GitHub account not linked"
 - **Cause:** Plugin Portal doesn't see your GitHub connection
-- **Solution:** Go to Plugin Portal settings and explicitly link your `perulish8` account
+- **Solution:** Go to Plugin Portal settings and explicitly link your `doug-hawley` account
 
 ### "Plugin ID already taken"
 - **Cause:** Someone else has claimed this exact ID
@@ -182,10 +182,10 @@ cat build/pluginDescriptors/io.github.perulish8.monorepo-changed-projects-plugin
 ## 📝 Final Notes
 
 ### Keep the Code Package Names
-Even though the plugin ID changed to `io.github.perulish8.*`, you can keep:
-- Package: `com.bitmoxie.monorepochangedprojects`
-- Group: `com.bitmoxie`
-- Implementation class: `com.bitmoxie.monorepochangedprojects.MonorepoChangedProjectsPlugin`
+Even though the plugin ID changed to `io.github.doug-hawley.*`, you can keep:
+- Package: `io.github.doughawley.monorepochangedprojects`
+- Group: `io.github.doug-hawley`
+- Implementation class: `io.github.doughawley.monorepochangedprojects.MonorepoChangedProjectsPlugin`
 
 **Only the plugin ID needs to match your GitHub username.**
 
@@ -194,12 +194,12 @@ Once approved, users will install your plugin with:
 
 ```kotlin
 plugins {
-    id("io.github.perulish8.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
 }
 ```
 
 The plugin will be available at:
-https://plugins.gradle.org/plugin/io.github.perulish8.monorepo-changed-projects-plugin
+https://plugins.gradle.org/plugin/io.github.doug-hawley.monorepo-changed-projects-plugin
 
 ---
 

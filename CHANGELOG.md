@@ -37,9 +37,11 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **CI configuration** - Removed Java 11 support (now supporting Java 17 and 21 only)
 - **CI configuration** - Removed Windows runners temporarily (now testing on Ubuntu and macOS only)
 - **Plugin metadata** - Enhanced `gradlePlugin` configuration with website, vcsUrl, and tags for better Plugin Portal presentation
-- **Plugin ID** - Updated to `io.github.perulish8.monorepo-changed-projects-plugin` (GitHub-based namespace) for simpler Plugin Portal verification without requiring domain ownership
-- **Group ID** - Updated from `com.bitmoxie` to `io.github.perulish8` to align with GitHub-based plugin ID namespace
-- **Repository URLs** - Updated all GitHub URLs from `bitmoxie` organization to `perulish8` user account
+- **Plugin ID** - Updated to `io.github.doug-hawley.monorepo-changed-projects-plugin` (GitHub-based namespace) for simpler Plugin Portal verification without requiring domain ownership
+- **Group ID** - Updated to `io.github.doug-hawley` to align with GitHub-based plugin ID namespace
+- **GitHub username** - Updated all references from `perulish8` to `doug-hawley` following GitHub username change
+- **Repository URLs** - Updated all GitHub URLs to reflect new username `doug-hawley`
+- **Package structure** - Repackaged from `com.bitmoxie.monorepochangedprojects` to `io.github.doughawley.monorepochangedprojects` to align with group ID
 - **README.md** - Restructured to focus on users of the plugin rather than developers; moved development instructions to CONTRIBUTING.md
 
 ### Fixed
@@ -49,8 +51,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ### BREAKING CHANGES
 - **Project renamed** from `projects-changed-plugin` to `monorepo-changed-projects-plugin`
-- **Plugin ID changed** from `com.bitmoxie.projects-changed` to `io.github.perulish8.monorepo-changed-projects-plugin` (using GitHub-based namespace for easier verification)
-- **Package renamed** from `com.bitmoxie.projectschanged` to `com.bitmoxie.monorepochangedprojects`
+- **Plugin ID changed** from `com.bitmoxie.projects-changed` to `io.github.doug-hawley.monorepo-changed-projects-plugin` (using GitHub-based namespace for easier verification)
+- **Package renamed** from `com.bitmoxie.projectschanged` to `io.github.doughawley.monorepochangedprojects` to align with group ID
 - **Main class renamed** from `ProjectsChangedPlugin` to `MonorepoChangedProjectsPlugin`
 - **Migrated tests** from JUnit to Kotest
 
