@@ -5,6 +5,24 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.1.0](https://github.com/doug-hawley/monorepo-changed-projects-plugin/compare/v1.0.1...v1.1.0) (2026-02-13)
+
+
+### Features
+
+* Repackage plugin to align with new GitHub username and update project structure ([7fc8cb1](https://github.com/doug-hawley/monorepo-changed-projects-plugin/commit/7fc8cb1b6a2a07e3576ab1b779cc60854a32a398))
+* Repackage plugin to align with new GitHub username and update project structure ([f9c2a67](https://github.com/doug-hawley/monorepo-changed-projects-plugin/commit/f9c2a673d9c4de0f8e8a8a4d48699bc095f46244))
+
+
+### Bug Fixes
+
+* New git username ([8ba6f37](https://github.com/doug-hawley/monorepo-changed-projects-plugin/commit/8ba6f37a23331f4a05778030577c676a6d1116b7))
+* Optimize CI configuration to avoid redundant test executions ([c59d7d6](https://github.com/doug-hawley/monorepo-changed-projects-plugin/commit/c59d7d638103d1c366d778eb9a5b98a3a1c0b72e))
+* Optimize CI configuration to avoid redundant test executions ([b4bddb0](https://github.com/doug-hawley/monorepo-changed-projects-plugin/commit/b4bddb09e632b027c3a8a749a256a736a2ce182c))
+* Update CI workflow to verify Maven Local path with new group ID ([de27049](https://github.com/doug-hawley/monorepo-changed-projects-plugin/commit/de27049c98fc1486acf8a61909cd4d8664ea312a))
+* Update CI workflow to verify Maven Local path with new group ID ([784faf6](https://github.com/doug-hawley/monorepo-changed-projects-plugin/commit/784faf64cfd77bf481ad3bce9a179405d2d32259))
+* Update plugin ID to it.github.perulish8.monorepo-changed-projects-plugin ([aa64f8e](https://github.com/doug-hawley/monorepo-changed-projects-plugin/commit/aa64f8e1c24b06b26b68a53dd5744e4d1c1c6d19))
+
 ## [1.0.1](https://github.com/Perulish8/monorepo-changed-projects-plugin/compare/v1.0.0...v1.0.1) (2026-02-06)
 
 
