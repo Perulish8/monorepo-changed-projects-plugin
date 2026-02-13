@@ -44,7 +44,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Build plugin
-        run: ./gradlew build --no-daemon --stacktrace
+        run: ./gradlew build -x test -x unitTest -x functionalTest --no-daemon --stacktrace
 
       - name: Run unit tests
         run: ./gradlew unitTest --no-daemon --stacktrace

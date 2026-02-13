@@ -36,6 +36,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Updated dependencies** - Updated Kotest from 5.8.0 to 5.9.1 and Gradle wrapper from 8.5 to 8.12
 - **CI configuration** - Removed Java 11 support (now supporting Java 17 and 21 only)
 - **CI configuration** - Removed Windows runners temporarily (now testing on Ubuntu and macOS only)
+- **CI configuration** - Optimized test execution to avoid running tests twice (excluded from build task, run explicitly via unitTest and functionalTest tasks)
 - **Plugin metadata** - Enhanced `gradlePlugin` configuration with website, vcsUrl, and tags for better Plugin Portal presentation
 - **Plugin ID** - Updated to `io.github.doug-hawley.monorepo-changed-projects-plugin` (GitHub-based namespace) for simpler Plugin Portal verification without requiring domain ownership
 - **Group ID** - Updated to `io.github.doug-hawley` to align with GitHub-based plugin ID namespace
