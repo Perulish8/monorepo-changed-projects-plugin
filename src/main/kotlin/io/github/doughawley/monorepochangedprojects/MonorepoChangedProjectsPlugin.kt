@@ -25,9 +25,28 @@ class MonorepoChangedProjectsPlugin : Plugin<Project> {
             group = "build"
             description = "Builds only the projects that have been affected by changes"
             dependsOn("detectChangedProjects")
+            mustRunAfter("detectChangedProjects")
 
             doLast {
-                val changedProjects = project.extensions.extraProperties.get("changedProjects") as Set<String>
+                // Verify the required property exists before accessing it
+                if (!project.extensions.extraProperties.has("changedProjects")) {
+                    project.logger.error("detectChangedProjects must run before buildChangedProjects")
+                    throw IllegalStateException(
+                        "Changed projects data not available. " +
+                        "The detectChangedProjects task must complete before buildChangedProjects can run."
+                    )
+                }
+
+                // Safe cast to handle null or wrong-type property
+                val changedProjectsRaw = project.extensions.extraProperties.get("changedProjects") as? Set<*>
+                if (changedProjectsRaw == null) {
+                    project.logger.lifecycle("No changed projects data available")
+                    return@doLast
+                }
+
+                // Filter to ensure all elements are Strings
+                @Suppress("UNCHECKED_CAST")
+                val changedProjects = changedProjectsRaw.filterIsInstance<String>().toSet()
 
                 if (changedProjects.isEmpty()) {
                     project.logger.lifecycle("No projects have changed - nothing to build")
