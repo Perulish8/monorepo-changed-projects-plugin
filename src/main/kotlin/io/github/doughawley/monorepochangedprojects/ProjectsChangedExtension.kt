@@ -1,6 +1,7 @@
 package io.github.doughawley.monorepochangedprojects
 
 import io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata
+import java.util.concurrent.atomic.AtomicBoolean
 
 /**
  * Extension for configuring the monorepo-changed-projects plugin.
@@ -47,8 +48,17 @@ open class ProjectsChangedExtension {
     internal var changedFilesMap: Map<String, List<String>> = emptyMap()
 
     /**
+     * Guards against concurrent metadata computation under --parallel builds.
+     * The first thread to win compareAndSet(false, true) performs the computation;
+     * all others see true and skip it.
+     */
+    internal val computationGuard = AtomicBoolean(false)
+
+    /**
      * Flag indicating whether metadata has been computed in the configuration phase.
+     * Marked volatile to ensure the write is visible to all threads once set.
      * Used to ensure metadata is available before task execution.
      */
+    @Volatile
     internal var metadataComputed: Boolean = false
 }

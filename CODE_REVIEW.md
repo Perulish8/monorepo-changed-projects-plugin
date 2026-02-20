@@ -14,7 +14,7 @@ Issues identified during code review. Severity: **high**, **medium**, **low**.
 ### 2. Race condition in plugin initialization
 - **File**: `src/main/kotlin/.../MonorepoChangedProjectsPlugin.kt` (lines 34–78)
 - **Issue**: The `synchronized(project.rootProject)` wrapper guards the check-and-set, but Gradle's `extraProperties` may not be thread-safe under the hood. An `AtomicBoolean` would be more explicit and reliable.
-- **Status**: Partially addressed in PR #26 (synchronized block added); AtomicBoolean refactor still pending
+- **Status**: Fully fixed in `fix-atomic-boolean-race-condition` — replaced `synchronized` + `extraProperties` string flag with `AtomicBoolean.compareAndSet` on `ProjectsChangedExtension`. `metadataComputed` marked `@Volatile` for cross-thread visibility.
 
 ### 3. Fragile reflection-based dependency unwrapping in `ProjectMetadataFactory`
 - **File**: `src/main/kotlin/.../ProjectMetadataFactory.kt` (lines 130–140)
