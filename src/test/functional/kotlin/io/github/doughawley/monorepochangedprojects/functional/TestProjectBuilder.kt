@@ -17,16 +17,18 @@ class TestProjectBuilder(private val projectDir: File) {
         val name: String,
         val dependencies: List<String> = emptyList(),
         val isBom: Boolean = false,
-        val usePlatform: Boolean = false
+        val usePlatform: Boolean = false,
+        val excludePatterns: List<String> = emptyList()
     )
 
     fun withSubproject(
         name: String,
         dependsOn: List<String> = emptyList(),
         isBom: Boolean = false,
-        usePlatform: Boolean = false
+        usePlatform: Boolean = false,
+        excludePatterns: List<String> = emptyList()
     ): TestProjectBuilder {
-        subprojects.add(SubprojectConfig(name, dependsOn, isBom, usePlatform))
+        subprojects.add(SubprojectConfig(name, dependsOn, isBom, usePlatform, excludePatterns))
         return this
     }
 
@@ -126,6 +128,12 @@ class TestProjectBuilder(private val projectDir: File) {
                         }
                     }
 
+                    appendLine("}")
+                }
+                if (subproject.excludePatterns.isNotEmpty()) {
+                    appendLine()
+                    appendLine("projectExcludes {")
+                    appendLine("    excludePatterns = listOf(${subproject.excludePatterns.joinToString { "\"$it\"" }})")
                     appendLine("}")
                 }
             }
