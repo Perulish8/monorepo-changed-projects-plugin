@@ -38,7 +38,7 @@ This dramatically reduces build times in CI/CD pipelines by avoiding unnecessary
 
 ```kotlin
 plugins {
-    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.1" // x-release-please-version
 }
 ```
 
@@ -62,7 +62,7 @@ projectsChanged {
 
 ### Build only changed projects
 
-The plugin provides a convenient task to automatically build only the projects that have been affected by changes:
+The plugin registers a `buildChangedProjects` task that automatically builds only the projects affected by changes:
 
 ```bash
 ./gradlew buildChangedProjects
@@ -75,16 +75,17 @@ This task will:
 
 ### Access changed projects in other tasks
 
+After `detectChangedProjects` runs, the plugin stores results in extra properties for use in downstream tasks:
+
 ```kotlin
 tasks.register("customTask") {
     dependsOn("detectChangedProjects")
     doLast {
         val changedProjects = project.extensions.extraProperties.get("changedProjects") as Set<String>
         println("Changed projects: $changedProjects")
-        
-        // Filter tasks to run only for changed projects
+
         changedProjects.forEach { projectPath ->
-            println("Building changed project: $projectPath")
+            println("Affected: $projectPath")
         }
     }
 }
@@ -92,25 +93,23 @@ tasks.register("customTask") {
 
 ### Access changed files metadata
 
-The plugin also provides detailed metadata including the list of changed files per project:
-
 ```kotlin
 tasks.register("showChangedFiles") {
     dependsOn("detectChangedProjects")
     doLast {
-        // Get the map of changed files per project
+        // Map of project path -> list of changed files in that project
         val changedFilesMap = project.extensions.extraProperties.get("changedFilesMap") as Map<String, List<String>>
-        
+
         changedFilesMap.forEach { (projectPath, files) ->
             println("Project $projectPath has ${files.size} changed files:")
             files.forEach { file ->
                 println("  - $file")
             }
         }
-        
-        // Get enhanced metadata with dependencies and changed files
+
+        // Full metadata including dependency graph and changed files
         val metadataMap = project.extensions.extraProperties.get("changedProjectsMetadata") as Map<String, io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata>
-        
+
         metadataMap.values.forEach { metadata ->
             // hasChanges() returns true if project has direct changes OR dependency changes
             if (metadata.hasChanges()) {
@@ -124,9 +123,9 @@ tasks.register("showChangedFiles") {
 }
 ```
 
-### Use ChangedProjects domain object
+### Use the ChangedProjects domain object
 
-The plugin provides a `ChangedProjects` domain object for convenient access to changed project information:
+The `ChangedProjects` domain object provides a richer API over the raw metadata map:
 
 ```kotlin
 import io.github.doughawley.monorepochangedprojects.domain.ChangedProjects
@@ -137,44 +136,41 @@ tasks.register("analyzeWithChangedProjects") {
     doLast {
         val metadataMap = project.extensions.extraProperties
             .get("changedProjectsMetadata") as Map<String, ProjectMetadata>
-        
-        // Create ChangedProjects wrapper
+
         val changedProjects = ChangedProjects(metadataMap.values.toList())
-        
-        // Get simple list of changed project names
+
+        // Simple list of changed project names
         println("Changed projects: ${changedProjects.getChangedProjects()}")
-        
-        // Get count
+
+        // Count
         println("Total changed: ${changedProjects.getChangedProjectCount()} of ${changedProjects.getAllProjects().size}")
-        
-        // Check if any changes exist
+
         if (changedProjects.hasAnyChanges()) {
             println("Changes detected!")
-            
-            // Get summary
-            val summary = changedProjects.getSummary()
-            println(summary)
-            
-            // Get file counts per project
-            changedProjects.getChangedFileCountByProject().forEach { (project, count) ->
-                println("$project: $count files")
+
+            // Summary (prints total projects, changed count, affected count, file counts)
+            println(changedProjects.getSummary())
+
+            // File counts per project
+            changedProjects.getChangedFileCountByProject().forEach { (path, count) ->
+                println("$path: $count files")
             }
-            
-            // Find projects depending on a changed project
+
+            // Projects that depend on a changed project
             changedProjects.getChangedProjects().forEach { projectName ->
                 val dependents = changedProjects.getProjectsDependingOn(projectName)
                 if (dependents.isNotEmpty()) {
                     println("Projects depending on $projectName: ${dependents.map { it.name }}")
                 }
             }
-            
-            // Filter changed projects by prefix (e.g., all apps)
+
+            // Filter by path prefix (e.g., all apps)
             val changedApps = changedProjects.getChangedProjectsWithPrefix(":apps")
             println("Changed apps: ${changedApps.map { it.name }}")
-            
-            // Or just get the names
-            val changedAppNames = changedProjects.getChangedProjectNamesWithPrefix(":apps")
-            println("Changed app names: $changedAppNames")
+
+            // Or just the paths
+            val changedAppPaths = changedProjects.getChangedProjectPathsWithPrefix(":apps")
+            println("Changed app paths: $changedAppPaths")
         }
     }
 }
@@ -184,39 +180,28 @@ tasks.register("analyzeWithChangedProjects") {
 
 ### Multi-module project usage
 
-For a multi-module project, the plugin can determine which subprojects are affected:
+Apply the plugin in your root `build.gradle.kts` and configure it for your branch convention:
 
 ```kotlin
 // In root build.gradle.kts
 plugins {
-    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.1" // x-release-please-version
 }
 
 projectsChanged {
     baseBranch = "develop"
     excludePatterns = listOf(".*\\.md", "\\.github/.*", "docs/.*")
 }
+```
 
-tasks.register("buildChangedProjects") {
-    dependsOn("detectChangedProjects")
-    doLast {
-        val changedProjects = project.extensions.extraProperties.get("changedProjects") as Set<String>
-        
-        if (changedProjects.isEmpty()) {
-            println("No projects changed")
-        } else {
-            changedProjects.forEach { projectPath ->
-                val proj = project.findProject(projectPath)
-                proj?.let {
-                    println("Running tests for $projectPath")
-                    it.tasks.findByName("test")?.let { testTask ->
-                        // Configure or run tests for changed project
-                    }
-                }
-            }
-        }
-    }
-}
+Then run the built-in tasks:
+
+```bash
+# Detect and print which projects changed
+./gradlew detectChangedProjects
+
+# Build only the affected projects
+./gradlew buildChangedProjects
 ```
 
 ### CI/CD Integration
@@ -228,15 +213,13 @@ tasks.register("ciTest") {
     dependsOn("detectChangedProjects")
     doLast {
         val changedProjects = project.extensions.extraProperties.get("changedProjects") as Set<String>
-        
+
         if (changedProjects.isEmpty()) {
             println("No changes detected, skipping tests")
         } else {
             changedProjects.forEach { projectPath ->
-                project.findProject(projectPath)?.tasks?.named("test")?.get()?.let {
-                    exec {
-                        commandLine("./gradlew", "$projectPath:test")
-                    }
+                exec {
+                    commandLine("./gradlew", "$projectPath:test")
                 }
             }
         }
@@ -257,26 +240,22 @@ tasks.register("buildChangedApps") {
     doLast {
         val metadataMap = project.extensions.extraProperties
             .get("changedProjectsMetadata") as Map<String, ProjectMetadata>
-        
+
         val changedProjects = ChangedProjects(metadataMap.values.toList())
-        
+
         // Get only changed apps (assuming apps are under :apps directory)
-        val changedApps = changedProjects.getChangedProjectPathsWithPrefix(":apps")
-        
-        if (changedApps.isEmpty()) {
+        val changedAppPaths = changedProjects.getChangedProjectPathsWithPrefix(":apps")
+
+        if (changedAppPaths.isEmpty()) {
             println("No app changes detected")
         } else {
-            println("Building ${changedApps.size} changed apps...")
-            changedApps.forEach { appPath ->
+            println("Building ${changedAppPaths.size} changed apps...")
+            changedAppPaths.forEach { appPath ->
                 println("Building $appPath")
                 exec {
                     commandLine("./gradlew", "$appPath:build")
                 }
             }
-        }
-    }
-}
-```
         }
     }
 }
@@ -393,4 +372,3 @@ This is expected if files in the root directory (outside of subproject directori
 ## License
 
 MIT License - see [LICENSE](LICENSE) file for details
-
