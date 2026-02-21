@@ -57,7 +57,7 @@ projectsChanged {
 ### Run the detection task
 
 ```bash
-./gradlew detectChangedProjects
+./gradlew printChangedProjects
 ```
 
 ### Build only changed projects
@@ -75,11 +75,11 @@ This task will:
 
 ### Access changed projects in other tasks
 
-After `detectChangedProjects` runs, the plugin stores results in extra properties for use in downstream tasks:
+After `printChangedProjects` runs, the plugin stores results in extra properties for use in downstream tasks:
 
 ```kotlin
 tasks.register("customTask") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val changedProjects = project.extensions.extraProperties.get("changedProjects") as Set<String>
         println("Changed projects: $changedProjects")
@@ -95,7 +95,7 @@ tasks.register("customTask") {
 
 ```kotlin
 tasks.register("showChangedFiles") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         // Map of project path -> list of changed files in that project
         val changedFilesMap = project.extensions.extraProperties.get("changedFilesMap") as Map<String, List<String>>
@@ -132,7 +132,7 @@ import io.github.doughawley.monorepochangedprojects.domain.ChangedProjects
 import io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata
 
 tasks.register("analyzeWithChangedProjects") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val metadataMap = project.extensions.extraProperties
             .get("changedProjectsMetadata") as Map<String, ProjectMetadata>
@@ -198,7 +198,7 @@ Then run the built-in tasks:
 
 ```bash
 # Detect and print which projects changed
-./gradlew detectChangedProjects
+./gradlew printChangedProjects
 
 # Build only the affected projects
 ./gradlew buildChangedProjects
@@ -210,7 +210,7 @@ Use in CI to only test changed modules:
 
 ```kotlin
 tasks.register("ciTest") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val changedProjects = project.extensions.extraProperties.get("changedProjects") as Set<String>
 
@@ -236,7 +236,7 @@ import io.github.doughawley.monorepochangedprojects.domain.ChangedProjects
 import io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata
 
 tasks.register("buildChangedApps") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val metadataMap = project.extensions.extraProperties
             .get("changedProjectsMetadata") as Map<String, ProjectMetadata>
@@ -357,7 +357,7 @@ This can happen if:
 Solution:
 ```bash
 git fetch origin
-./gradlew detectChangedProjects
+./gradlew printChangedProjects
 ```
 
 ### No projects detected despite changes
@@ -365,7 +365,7 @@ git fetch origin
 Check your `excludePatterns` configuration - you may be inadvertently excluding files. Enable logging to see what files are being detected:
 
 ```bash
-./gradlew detectChangedProjects --info
+./gradlew printChangedProjects --info
 ```
 
 ### Root project always shows as changed

@@ -22,7 +22,7 @@ class BuildChangedProjectsTaskTest : FunSpec({
         task?.description shouldBe "Builds only the projects that have been affected by changes"
     }
 
-    test("buildChangedProjects should have detectChangedProjects as dependency") {
+    test("buildChangedProjects should have printChangedProjects as dependency") {
         // given
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("io.github.doug-hawley.monorepo-changed-projects-plugin")
@@ -34,7 +34,7 @@ class BuildChangedProjectsTaskTest : FunSpec({
         task shouldNotBe null
         val dependencies = task?.taskDependencies?.getDependencies(task)?.map { it.name }
         dependencies shouldNotBe null
-        dependencies!! shouldContain "detectChangedProjects"
+        dependencies!! shouldContain "printChangedProjects"
     }
 
     test("safe casting logic should handle null property") {
@@ -98,7 +98,7 @@ class BuildChangedProjectsTaskTest : FunSpec({
         val project = ProjectBuilder.builder().build()
         project.pluginManager.apply("io.github.doug-hawley.monorepo-changed-projects-plugin")
 
-        // when - property is not set (detectChangedProjects didn't run)
+        // when - property is not set (printChangedProjects didn't run)
         val task = project.tasks.findByName("buildChangedProjects")
         task shouldNotBe null
 

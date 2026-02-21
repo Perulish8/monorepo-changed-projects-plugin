@@ -95,7 +95,7 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
         builtProjects shouldContainAll setOf(Projects.APP1, Projects.APP2)
     }
 
-    test("buildChangedProjects runs after detectChangedProjects") {
+    test("buildChangedProjects runs after printChangedProjects") {
         // Setup
         val project = testProjectListener.createStandardProject()
 
@@ -106,7 +106,7 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
         val result = project.runTask("buildChangedProjects")
 
         // Assert - both tasks should have run
-        result.task(":detectChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":printChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
         result.task(":buildChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
     }
 
@@ -167,10 +167,10 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
         project.commitAll("Update BOM")
 
         // Execute
-        val result = project.runTask("detectChangedProjects")
+        val result = project.runTask("printChangedProjects")
 
         // Assert
-        result.task(":detectChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":printChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
 
         val changedProjects = result.extractChangedProjects()
         // BOM changed, so all projects that depend on it should be affected
@@ -199,10 +199,10 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
         project.commitAll("Update BOM and common-lib")
 
         // Execute
-        val result = project.runTask("detectChangedProjects")
+        val result = project.runTask("printChangedProjects")
 
         // Assert
-        result.task(":detectChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":printChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
 
         val changedProjects = result.extractChangedProjects()
         // All projects affected (BOM affects all, common-lib also changed)
@@ -217,7 +217,7 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
         )
     }
 
-    test("buildChangedProjects automatically runs detectChangedProjects due to dependsOn") {
+    test("buildChangedProjects automatically runs printChangedProjects due to dependsOn") {
         // This test validates Issue #2 fix - that property is available when buildChangedProjects runs
         // Setup
         val project = testProjectListener.createStandardProject()
@@ -226,20 +226,20 @@ class BuildChangedProjectsFunctionalTest : FunSpec({
         project.appendToFile(Files.APP1_SOURCE, "\n// Change")
         project.commitAll("Change app1")
 
-        // Execute buildChangedProjects WITHOUT explicitly running detectChangedProjects first
-        // The dependsOn relationship should ensure detectChangedProjects runs first
+        // Execute buildChangedProjects WITHOUT explicitly running printChangedProjects first
+        // The dependsOn relationship should ensure printChangedProjects runs first
         val result = project.runTask("buildChangedProjects")
 
         // Assert
         // Both tasks should have run successfully
-        result.task(":detectChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":printChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
         result.task(":buildChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
 
         // The property should have been available (no error about missing property)
         val builtProjects = result.extractBuiltProjects()
         builtProjects shouldContain Projects.APP1
         result.output shouldNotContain "Changed projects data not available"
-        result.output shouldNotContain "detectChangedProjects must run before buildChangedProjects"
+        result.output shouldNotContain "printChangedProjects must run before buildChangedProjects"
     }
 })
 

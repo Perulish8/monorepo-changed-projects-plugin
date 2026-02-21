@@ -40,7 +40,7 @@ GitChangedFilesDetector  →  ProjectFileMapper  →  ProjectMetadataFactory  �
 |---|---|
 | `MonorepoChangedProjectsPlugin` | Plugin entry point; registers extension and tasks; triggers metadata computation in `projectsEvaluated` |
 | `ProjectsChangedExtension` | User configuration DSL (`baseBranch`, `includeUntracked`, `excludePatterns`) and internal metadata storage |
-| `DetectChangedProjectsTask` | Reads pre-computed metadata from extension and outputs results |
+| `PrintChangedProjectsTask` | Reads pre-computed metadata from extension and outputs results |
 | `GitChangedFilesDetector` | Runs `git diff`, `git diff --cached`, and `git ls-files` to find changed files; applies exclude patterns |
 | `ProjectFileMapper` | Maps changed file paths to Gradle project paths |
 | `ProjectMetadataFactory` | Builds dependency graph by introspecting Gradle `ProjectDependency` objects |

@@ -275,8 +275,7 @@ class TestProject(
  */
 fun BuildResult.extractChangedProjects(): Set<String> {
     val regex = """All affected projects \(including dependents\): (.*)""".toRegex()
-    val match = regex.find(output)
-    val projectsString = match?.groupValues?.get(1)?.trim() ?: ""
+    val projectsString = regex.findAll(output).lastOrNull()?.groupValues?.get(1)?.trim() ?: ""
 
     return if (projectsString.isEmpty()) {
         emptySet()
@@ -321,8 +320,3 @@ fun BuildResult.extractBuiltProjects(): Set<String> {
     }
 }
 
-fun BuildResult.extractChangedFilesCount(): Int {
-    val regex = """Changed files count: (\d+)""".toRegex()
-    val match = regex.find(output)
-    return match?.groupValues?.get(1)?.toInt() ?: 0
-}

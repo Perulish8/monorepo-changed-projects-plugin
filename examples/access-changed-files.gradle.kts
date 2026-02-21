@@ -12,7 +12,7 @@ projectsChanged {
 
 // Example 1: Simple - Just list changed projects
 tasks.register("listChangedProjects") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val changedProjects = project.extensions.extraProperties.get("changedProjects") as Set<String>
         println("Changed projects: ${changedProjects.joinToString(", ")}")
@@ -21,7 +21,7 @@ tasks.register("listChangedProjects") {
 
 // Example 2: Detailed - List changed files per project
 tasks.register("listChangedFiles") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val changedFilesMap = project.extensions.extraProperties
             .get("changedFilesMap") as Map<String, List<String>>
@@ -38,7 +38,7 @@ tasks.register("listChangedFiles") {
 
 // Example 3: Advanced - Use full metadata with dependencies
 tasks.register("analyzeChanges") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val metadataMap = project.extensions.extraProperties
             .get("changedProjectsMetadata") as Map<String, io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata>
@@ -62,7 +62,7 @@ tasks.register("analyzeChanges") {
 
 // Example 4: Conditional build based on file types
 tasks.register("smartBuild") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val changedFilesMap = project.extensions.extraProperties
             .get("changedFilesMap") as Map<String, List<String>>
@@ -91,7 +91,7 @@ tasks.register("smartBuild") {
 
 // Example 5: Generate impact report
 tasks.register("impactReport") {
-    dependsOn("detectChangedProjects")
+    dependsOn("printChangedProjects")
     doLast {
         val metadataMap = project.extensions.extraProperties
             .get("changedProjectsMetadata") as Map<String, io.github.doughawley.monorepochangedprojects.domain.ProjectMetadata>

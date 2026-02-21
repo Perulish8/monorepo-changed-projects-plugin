@@ -76,8 +76,8 @@ class MonorepoChangedProjectsPlugin : Plugin<Project> {
             }
         }
 
-        // Register the detectChangedProjects task
-        project.tasks.register("detectChangedProjects", DetectChangedProjectsTask::class.java).configure {
+        // Register the printChangedProjects task
+        project.tasks.register("printChangedProjects", PrintChangedProjectsTask::class.java).configure {
             group = "verification"
             description = "Detects which projects have changed based on git history"
         }
@@ -88,7 +88,7 @@ class MonorepoChangedProjectsPlugin : Plugin<Project> {
         project.tasks.register("buildChangedProjects").configure {
             group = "build"
             description = "Builds only the projects that have been affected by changes"
-            dependsOn("detectChangedProjects")
+            dependsOn("printChangedProjects")
 
             doLast {
                 val extension = project.rootProject.extensions.getByType(ProjectsChangedExtension::class.java)

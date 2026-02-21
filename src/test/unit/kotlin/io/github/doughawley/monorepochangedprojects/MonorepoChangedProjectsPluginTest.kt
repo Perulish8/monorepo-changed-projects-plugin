@@ -16,9 +16,9 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
         project.pluginManager.apply("io.github.doug-hawley.monorepo-changed-projects-plugin")
 
         // then
-        val task = project.tasks.findByName("detectChangedProjects")
+        val task = project.tasks.findByName("printChangedProjects")
         task shouldNotBe null
-        task.shouldBeInstanceOf<DetectChangedProjectsTask>()
+        task.shouldBeInstanceOf<PrintChangedProjectsTask>()
     }
 
     test("plugin registers extension") {
@@ -71,7 +71,7 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
         project.pluginManager.apply("io.github.doug-hawley.monorepo-changed-projects-plugin")
 
         // when
-        val task = project.tasks.findByName("detectChangedProjects")
+        val task = project.tasks.findByName("printChangedProjects")
 
         // then
         task shouldNotBe null
@@ -87,7 +87,7 @@ class MonorepoChangedProjectsPluginTest : FunSpec({
                 .withProjectDir(tempDir)
                 .build()
             project.pluginManager.apply("io.github.doug-hawley.monorepo-changed-projects-plugin")
-            val task = project.tasks.findByName("detectChangedProjects") as DetectChangedProjectsTask
+            val task = project.tasks.findByName("printChangedProjects") as PrintChangedProjectsTask
 
             // when
             task.detectChanges()
