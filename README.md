@@ -324,7 +324,22 @@ This ensures that:
 |----------|------|---------|-------------|
 | `baseBranch` | String | `"main"` | The git branch to compare against |
 | `includeUntracked` | Boolean | `true` | Whether to include untracked files in detection |
-| `excludePatterns` | List<String> | `[]` | Regex patterns for files to exclude |
+| `excludePatterns` | List<String> | `[]` | Regex patterns for files to exclude globally |
+
+### Per-project excludes
+
+Individual subprojects can declare their own exclude patterns using the `projectExcludes` extension. This is useful when a team wants to ignore generated files or other noise that is specific to their module without cluttering the root configuration.
+
+```kotlin
+// In :api/build.gradle.kts
+projectExcludes {
+    excludePatterns = listOf("generated/.*", ".*\\.json")
+}
+```
+
+- Patterns are Java regex strings matched against file paths **relative to the subproject directory** (e.g., `generated/Code.kt`, not `api/generated/Code.kt`).
+- Per-project patterns are applied **after** global `excludePatterns`, so the two stages are independent and complementary.
+- The extension is automatically registered on all subprojects by the plugin — subprojects do not need to apply the plugin themselves.
 
 ## Troubleshooting
 

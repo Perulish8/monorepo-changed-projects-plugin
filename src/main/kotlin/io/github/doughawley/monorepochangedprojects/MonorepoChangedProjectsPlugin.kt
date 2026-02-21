@@ -3,6 +3,7 @@ package io.github.doughawley.monorepochangedprojects
 import io.github.doughawley.monorepochangedprojects.git.GitCommandExecutor
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.logging.Logger
 
 /**
  * Gradle plugin that detects which projects have changed based on git history.
@@ -23,6 +24,15 @@ class MonorepoChangedProjectsPlugin : Plugin<Project> {
                     "projectsChanged",
                     ProjectsChangedExtension::class.java
                 )
+        }
+
+        // Register per-project exclude extension on every subproject.
+        // Subproject Project objects already exist at this point (created from settings.gradle.kts),
+        // so iteration is safe without waiting for subproject evaluation.
+        if (project == project.rootProject) {
+            project.subprojects.forEach { subproject ->
+                subproject.extensions.create("projectExcludes", ProjectExcludesExtension::class.java)
+            }
         }
 
         // Compute metadata in configuration phase after ALL projects are evaluated.
@@ -128,8 +138,11 @@ class MonorepoChangedProjectsPlugin : Plugin<Project> {
         val changedFiles = gitDetector.getChangedFiles(project.rootDir, extension)
         val changedFilesMap = projectMapper.mapChangedFilesToProjects(project.rootProject, changedFiles)
 
+        // Apply per-project exclude patterns (configured via projectExcludes { } in each subproject)
+        val filteredChangedFilesMap = applyPerProjectExcludes(project.rootProject, changedFilesMap, logger)
+
         // Build metadata with changed files information
-        val metadataMap = metadataFactory.buildProjectMetadataMap(project.rootProject, changedFilesMap)
+        val metadataMap = metadataFactory.buildProjectMetadataMap(project.rootProject, filteredChangedFilesMap)
 
         // Get all affected projects (those with changes OR dependency changes).
         // ":" is Gradle's path for the root project — it has no dedicated build task
@@ -152,10 +165,47 @@ class MonorepoChangedProjectsPlugin : Plugin<Project> {
         // Store in extension for access during configuration and execution
         extension.metadataMap = metadataMap
         extension.allAffectedProjects = allAffectedProjects
-        extension.changedFilesMap = changedFilesMap
+        extension.changedFilesMap = filteredChangedFilesMap
 
         logger.lifecycle("Changed files count: ${changedFiles.size}")
         logger.lifecycle("All affected projects (including dependents): ${allAffectedProjects.joinToString(", ").ifEmpty { "none" }}")
+    }
+
+    /**
+     * Applies per-project exclude patterns to filter files from the changed files map.
+     * Patterns are matched against paths relative to each project's directory,
+     * so a pattern "generated/.*" in :api matches "api/generated/Code.kt".
+     */
+    private fun applyPerProjectExcludes(
+        rootProject: Project,
+        changedFilesMap: Map<String, List<String>>,
+        logger: Logger
+    ): Map<String, List<String>> {
+        return changedFilesMap.mapValues { (projectPath, files) ->
+            val targetProject = rootProject.findProject(projectPath)
+            val ext = targetProject?.extensions?.findByType(ProjectExcludesExtension::class.java)
+            val patterns = ext?.excludePatterns?.map { Regex(it) } ?: emptyList()
+            if (patterns.isEmpty()) {
+                files
+            } else {
+                val projectRelPath = targetProject
+                    ?.projectDir?.relativeTo(rootProject.rootDir)?.path?.replace('\\', '/')
+                    ?: ""
+                files.filterNot { file ->
+                    val localFile = if (projectRelPath.isNotEmpty() && file.startsWith("$projectRelPath/")) {
+                        file.removePrefix("$projectRelPath/")
+                    } else {
+                        file
+                    }
+                    patterns.any { pattern -> localFile.matches(pattern) }
+                }.also { filtered ->
+                    val excluded = files.size - filtered.size
+                    if (excluded > 0) {
+                        logger.debug("[$projectPath] Per-project excludes removed $excluded file(s)")
+                    }
+                }
+            }
+        }
     }
 
     /**
