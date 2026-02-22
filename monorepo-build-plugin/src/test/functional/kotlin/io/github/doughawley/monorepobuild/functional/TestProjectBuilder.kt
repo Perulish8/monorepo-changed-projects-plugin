@@ -238,7 +238,7 @@ class TestProject(
     fun runTask(vararg tasks: String): BuildResult {
         return GradleRunner.create()
             .withProjectDir(projectDir)
-            .withArguments(tasks.toList() + "--stacktrace")
+            .withArguments(tasks.toList() + listOf("--stacktrace", "--no-configuration-cache"))
             .withPluginClasspath()
             .build()
     }
@@ -246,7 +246,7 @@ class TestProject(
     fun runTaskAndFail(vararg tasks: String): BuildResult {
         return GradleRunner.create()
             .withProjectDir(projectDir)
-            .withArguments(tasks.toList() + "--stacktrace")
+            .withArguments(tasks.toList() + listOf("--stacktrace", "--no-configuration-cache"))
             .withPluginClasspath()
             .buildAndFail()
     }
