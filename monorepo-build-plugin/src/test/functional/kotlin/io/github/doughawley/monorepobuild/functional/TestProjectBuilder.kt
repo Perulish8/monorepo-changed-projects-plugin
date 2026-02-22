@@ -240,6 +240,7 @@ class TestProject(
             .withProjectDir(projectDir)
             .withArguments(tasks.toList() + listOf("--stacktrace", "--no-configuration-cache"))
             .withPluginClasspath()
+            .forwardOutput()
             .build()
     }
 
@@ -248,6 +249,7 @@ class TestProject(
             .withProjectDir(projectDir)
             .withArguments(tasks.toList() + listOf("--stacktrace", "--no-configuration-cache"))
             .withPluginClasspath()
+            .forwardOutput()
             .buildAndFail()
     }
 
