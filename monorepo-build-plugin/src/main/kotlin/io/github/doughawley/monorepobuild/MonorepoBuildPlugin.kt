@@ -4,12 +4,16 @@ import io.github.doughawley.monorepobuild.git.GitCommandExecutor
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project
+import org.gradle.api.configuration.BuildFeatures
 import org.gradle.api.logging.Logger
+import javax.inject.Inject
 
 /**
  * Gradle plugin that detects which projects have changed based on git history.
  */
-class MonorepoBuildPlugin : Plugin<Project> {
+class MonorepoBuildPlugin @Inject constructor(
+    private val buildFeatures: BuildFeatures
+) : Plugin<Project> {
 
     private enum class DetectionMode { FROM_BRANCH, FROM_REF }
 
@@ -19,6 +23,14 @@ class MonorepoBuildPlugin : Plugin<Project> {
     }
 
     override fun apply(project: Project) {
+        if (buildFeatures.configurationCache.requested.getOrElse(false)) {
+            throw GradleException(
+                "monorepo-build-plugin is incompatible with the Gradle configuration cache " +
+                "because it executes git commands during the configuration phase. " +
+                "Set org.gradle.configuration-cache=false in your gradle.properties."
+            )
+        }
+
         // Register the extension on the root project to ensure it's shared
         val rootExtension = if (project == project.rootProject) {
             project.extensions.create(
