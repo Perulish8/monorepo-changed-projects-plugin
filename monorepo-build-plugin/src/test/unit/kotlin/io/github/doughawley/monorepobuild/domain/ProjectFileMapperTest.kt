@@ -1,4 +1,4 @@
-package io.github.doughawley.monorepobuild
+package io.github.doughawley.monorepobuild.domain
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty

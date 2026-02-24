@@ -1,6 +1,5 @@
-package io.github.doughawley.monorepobuild
+package io.github.doughawley.monorepobuild.domain
 
-import io.github.doughawley.monorepobuild.domain.ProjectMetadata
 import org.gradle.api.Project
 import org.gradle.api.artifacts.ProjectDependency
 import org.gradle.api.logging.Logger
@@ -75,7 +74,6 @@ class ProjectMetadataFactory(private val logger: Logger) {
 
         // Cache the metadata
         metadataMap[project.path] = metadata
-
 
         return metadata
     }

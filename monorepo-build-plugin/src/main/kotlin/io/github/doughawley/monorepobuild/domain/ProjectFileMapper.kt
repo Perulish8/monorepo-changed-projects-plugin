@@ -1,4 +1,4 @@
-package io.github.doughawley.monorepobuild
+package io.github.doughawley.monorepobuild.domain
 
 import org.gradle.api.Project
 

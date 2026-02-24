@@ -1,7 +1,8 @@
-package io.github.doughawley.monorepobuild
+package io.github.doughawley.monorepobuild.git
 
-import io.kotest.core.spec.style.FunSpec
+import io.github.doughawley.monorepobuild.MonorepoBuildExtension
 import io.kotest.assertions.throwables.shouldThrow
+import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldBeEmpty
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldContainAll

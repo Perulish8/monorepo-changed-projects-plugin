@@ -1,4 +1,4 @@
-package io.github.doughawley.monorepobuild
+package io.github.doughawley.monorepobuild.git
 
 import io.kotest.assertions.throwables.shouldThrow
 import io.kotest.core.spec.style.FunSpec
