@@ -1,4 +1,4 @@
-package io.github.doughawley.monorepobuild
+package io.github.doughawley.monorepobuild.domain
 
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContain
@@ -463,7 +463,6 @@ class ProjectMetadataFactoryTest : FunSpec({
         serviceMetadata.changedFiles shouldContain "service/Service.kt"
         serviceMetadata.hasChanges() shouldBe true
 
-        // Check dependency has its own changed files
         serviceMetadata.dependencies shouldHaveSize 1
         val commonLibMetadata = serviceMetadata.dependencies[0]
         commonLibMetadata.changedFiles shouldHaveSize 1
@@ -486,8 +485,6 @@ class ProjectMetadataFactoryTest : FunSpec({
         platform.pluginManager.apply("java-platform")
         service.pluginManager.apply("java-library")
 
-        // platform(project(":platform")) returns the same ProjectDependency with platform
-        // attributes set — it is already a ProjectDependency and requires no reflection to unwrap
         service.dependencies.add("implementation", service.dependencies.platform(platform))
 
         val logger = rootProject.logger

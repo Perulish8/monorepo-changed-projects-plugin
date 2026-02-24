@@ -1,5 +1,6 @@
-package io.github.doughawley.monorepobuild
+package io.github.doughawley.monorepobuild.task
 
+import io.github.doughawley.monorepobuild.MonorepoBuildExtension
 import org.gradle.api.DefaultTask
 import org.gradle.api.GradleException
 import org.gradle.api.file.RegularFileProperty

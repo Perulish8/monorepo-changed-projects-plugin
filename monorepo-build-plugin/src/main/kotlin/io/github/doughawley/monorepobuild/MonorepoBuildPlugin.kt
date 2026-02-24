@@ -1,5 +1,12 @@
 package io.github.doughawley.monorepobuild
 
+import io.github.doughawley.monorepobuild.domain.ProjectFileMapper
+import io.github.doughawley.monorepobuild.domain.ProjectMetadataFactory
+import io.github.doughawley.monorepobuild.git.GitChangedFilesDetector
+import io.github.doughawley.monorepobuild.git.GitRepository
+import io.github.doughawley.monorepobuild.task.PrintChangedProjectsFromRefTask
+import io.github.doughawley.monorepobuild.task.PrintChangedProjectsTask
+import io.github.doughawley.monorepobuild.task.WriteChangedProjectsFromRefTask
 import org.gradle.api.GradleException
 import org.gradle.api.Plugin
 import org.gradle.api.Project

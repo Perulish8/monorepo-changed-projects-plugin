@@ -1,5 +1,6 @@
 package io.github.doughawley.monorepobuild
 
+import io.github.doughawley.monorepobuild.task.PrintChangedProjectsTask
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
