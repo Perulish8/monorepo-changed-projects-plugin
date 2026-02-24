@@ -58,7 +58,7 @@ class MonorepoBuildPlugin @Inject constructor(
         // so iteration is safe without waiting for subproject evaluation.
         if (project == project.rootProject) {
             project.subprojects.forEach { subproject ->
-                subproject.extensions.create("projectExcludes", ProjectExcludesExtension::class.java)
+                subproject.extensions.create("monorepoProjectConfig", MonorepoProjectConfigExtension::class.java)
             }
         }
 
@@ -267,7 +267,7 @@ class MonorepoBuildPlugin @Inject constructor(
         }
         val changedFilesMap = projectMapper.mapChangedFilesToProjects(project.rootProject, changedFiles)
 
-        // Apply per-project exclude patterns (configured via projectExcludes { } in each subproject)
+        // Apply per-project exclude patterns (configured via monorepoProjectConfig { } in each subproject)
         val filteredChangedFilesMap = applyPerProjectExcludes(project.rootProject, changedFilesMap, logger)
 
         // Build metadata with changed files information
@@ -312,7 +312,7 @@ class MonorepoBuildPlugin @Inject constructor(
     ): Map<String, List<String>> {
         return changedFilesMap.mapValues { (projectPath, files) ->
             val targetProject = rootProject.findProject(projectPath)
-            val ext = targetProject?.extensions?.findByType(ProjectExcludesExtension::class.java)
+            val ext = targetProject?.extensions?.findByType(MonorepoProjectConfigExtension::class.java)
             val patterns = ext?.excludePatterns?.map { Regex(it) } ?: emptyList()
             if (patterns.isEmpty()) {
                 files
