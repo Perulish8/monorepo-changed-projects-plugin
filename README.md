@@ -46,11 +46,11 @@ monorepoBuild {
 }
 ```
 
-Individual subprojects can declare their own exclude patterns using the `projectExcludes` extension. Patterns are matched against paths relative to the subproject directory and are applied after global `excludePatterns`.
+Individual subprojects can declare their own exclude patterns using the `monorepoProjectConfig` extension. Patterns are matched against paths relative to the subproject directory and are applied after global `excludePatterns`.
 
 ```kotlin
 // In :api/build.gradle.kts
-projectExcludes {
+monorepoProjectConfig {
     excludePatterns = listOf(     // regex patterns relative to this subproject's directory
         "generated/.*",
         ".*\\.json"
@@ -426,11 +426,11 @@ This ensures that:
 
 ### Per-project excludes
 
-Individual subprojects can declare their own exclude patterns using the `projectExcludes` extension. This is useful when a team wants to ignore generated files or other noise that is specific to their module without cluttering the root configuration.
+Individual subprojects can declare their own exclude patterns using the `monorepoProjectConfig` extension. This is useful when a team wants to ignore generated files or other noise that is specific to their module without cluttering the root configuration.
 
 ```kotlin
 // In :api/build.gradle.kts
-projectExcludes {
+monorepoProjectConfig {
     excludePatterns = listOf("generated/.*", ".*\\.json")
 }
 ```

@@ -133,7 +133,7 @@ class TestProjectBuilder(private val projectDir: File) {
                 }
                 if (subproject.excludePatterns.isNotEmpty()) {
                     appendLine()
-                    appendLine("projectExcludes {")
+                    appendLine("monorepoProjectConfig {")
                     appendLine("    excludePatterns = listOf(${subproject.excludePatterns.joinToString { "\"$it\"" }})")
                     appendLine("}")
                 }
