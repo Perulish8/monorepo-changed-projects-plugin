@@ -3,7 +3,6 @@ package io.github.doughawley.monorepobuild.functional
 import org.gradle.testkit.runner.BuildResult
 import org.gradle.testkit.runner.GradleRunner
 import java.io.File
-import kotlin.io.path.createTempDirectory
 
 /**
  * Builder for creating test Gradle projects for functional testing.
@@ -178,8 +177,6 @@ class TestProject(
     private val remoteDir: File? = null
 ) {
 
-    val gradleUserHome: File = createTempDirectory("gradle-user-home-").toFile()
-
     fun initGit() {
         if (useRemote && remoteDir != null) {
             // Create a bare repository to act as origin
@@ -274,7 +271,6 @@ class TestProject(
 
     private fun gradleRunner(): GradleRunner {
         val env = HashMap(System.getenv())
-        env["GRADLE_USER_HOME"] = gradleUserHome.absolutePath
         // Strip env vars that trigger Develocity auto-injection via gradle/actions/setup-gradle.
         // The injected init script interferes with projectsEvaluated task registration in CI.
         env.keys.removeIf { it.startsWith("DEVELOCITY_") || it.startsWith("GRADLE_BUILD_ACTION_") }

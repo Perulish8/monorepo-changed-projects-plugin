@@ -65,7 +65,6 @@ class TestProjectListener : TestListener {
     }
 
     override suspend fun afterEach(testCase: TestCase, result: TestResult) {
-        currentTestProject?.gradleUserHome?.deleteRecursively()
         currentTestProject = null
         currentTestDir?.let { dir ->
             if (dir.exists()) {
