@@ -1,7 +1,6 @@
 package io.github.doughawley.monorepobuild
 
 import io.github.doughawley.monorepobuild.domain.MonorepoProjects
-import org.gradle.api.Project
 
 /**
  * Formats the changed-projects report as a string.
@@ -9,7 +8,7 @@ import org.gradle.api.Project
  * Responsible solely for formatting; callers supply the header and the domain
  * object, and decide how to output the result.
  */
-class ChangedProjectsPrinter(private val rootProject: Project) {
+class ChangedProjectsPrinter {
 
     /**
      * Builds the changed-projects report string.
@@ -38,16 +37,9 @@ class ChangedProjectsPrinter(private val rootProject: Project) {
 
         val sb = StringBuilder()
         sb.appendLine(header)
-
+        sb.appendLine()
         directlyChanged.forEach { projectPath ->
-            val project = monorepoProjects.projects.find { it.fullyQualifiedName == projectPath }
-            val files = buildDisplayFiles(projectPath, project?.changedFiles.orEmpty())
-            sb.appendLine()
             sb.appendLine("  $projectPath")
-            files.take(FILE_DISPLAY_LIMIT).forEach { sb.appendLine("    - $it") }
-            if (files.size > FILE_DISPLAY_LIMIT) {
-                sb.appendLine("    ... and ${files.size - FILE_DISPLAY_LIMIT} more")
-            }
         }
 
         if (transitivelyAffected.isNotEmpty()) {
@@ -67,25 +59,5 @@ class ChangedProjectsPrinter(private val rootProject: Project) {
         }
 
         return sb.toString().trimEnd()
-    }
-
-    private fun buildDisplayFiles(projectPath: String, files: List<String>): List<String> {
-        val projectDir = rootProject.findProject(projectPath)
-            ?.projectDir
-            ?.relativeTo(rootProject.rootDir)
-            ?.path
-            ?.replace('\\', '/')
-            .orEmpty()
-        return files.map { file ->
-            if (projectDir.isNotEmpty() && file.startsWith("$projectDir/")) {
-                file.removePrefix("$projectDir/")
-            } else {
-                file
-            }
-        }.sorted()
-    }
-
-    companion object {
-        const val FILE_DISPLAY_LIMIT = 50
     }
 }
