@@ -10,10 +10,9 @@ import org.gradle.api.tasks.TaskAction
  * Task that prints which projects have changed based on git history and dependency analysis.
  *
  * Output format:
- *   - Directly changed projects are listed with their changed files (relative to the project directory).
+ *   - Directly changed projects are listed by path.
  *   - Transitively affected projects are listed with an "(affected via ...)" annotation naming
  *     the direct dependencies that carry the change.
- *   - File lists are capped at ChangedProjectsPrinter.FILE_DISPLAY_LIMIT entries.
  */
 abstract class PrintChangedProjectsTask : DefaultTask() {
 
@@ -37,7 +36,7 @@ abstract class PrintChangedProjectsTask : DefaultTask() {
             }
         }
 
-        logger.lifecycle(ChangedProjectsPrinter(project.rootProject).buildReport(
+        logger.lifecycle(ChangedProjectsPrinter().buildReport(
             header = "Changed projects:",
             monorepoProjects = extension.monorepoProjects
         ))

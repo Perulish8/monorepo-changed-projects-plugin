@@ -10,10 +10,9 @@ import org.gradle.api.tasks.TaskAction
  * Task that prints which projects have changed since a specific commit ref.
  *
  * Output format:
- *   - Directly changed projects are listed with their changed files (relative to the project directory).
+ *   - Directly changed projects are listed by path.
  *   - Transitively affected projects are listed with an "(affected via ...)" annotation naming
  *     the direct dependencies that carry the change.
- *   - File lists are capped at ChangedProjectsPrinter.FILE_DISPLAY_LIMIT entries.
  */
 abstract class PrintChangedProjectsFromRefTask : DefaultTask() {
 
@@ -31,7 +30,7 @@ abstract class PrintChangedProjectsFromRefTask : DefaultTask() {
         }
 
         val resolvedRef = extension.commitRef
-        logger.lifecycle(ChangedProjectsPrinter(project.rootProject).buildReport(
+        logger.lifecycle(ChangedProjectsPrinter().buildReport(
             header = "Changed projects (since $resolvedRef):",
             monorepoProjects = extension.monorepoProjects
         ))
