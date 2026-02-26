@@ -7,7 +7,7 @@ import io.kotest.matchers.collections.shouldHaveSize
 import io.kotest.matchers.shouldBe
 import io.kotest.matchers.shouldNotBe
 
-class ChangedProjectsTest : FunSpec({
+class MonorepoProjectsTest : FunSpec({
 
     test("getChangedProjectPaths returns fully qualified paths of affected projects") {
         // given
@@ -15,10 +15,10 @@ class ChangedProjectsTest : FunSpec({
         val service = ProjectMetadata("service", ":services:service", dependencies = listOf(lib))
 
         val projects = listOf(lib, service)
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getChangedProjectPaths()
+        val result = monorepoProjects.getChangedProjectPaths()
 
         // then - should include both lib (direct change) and service (depends on lib)
         result shouldHaveSize 2
@@ -32,10 +32,10 @@ class ChangedProjectsTest : FunSpec({
         val serviceB = ProjectMetadata("service-b", ":service-b")
 
         val projects = listOf(lib, serviceA, serviceB)
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val count = changedProjects.getChangedProjectCount()
+        val count = monorepoProjects.getChangedProjectCount()
 
         // then - should include lib (direct change) and service-a (depends on lib)
         count shouldBe 2
@@ -48,10 +48,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-b", ":libs:project-b"),
             ProjectMetadata("project-c", ":project-c")
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getAllProjectPaths()
+        val result = monorepoProjects.getAllProjectPaths()
 
         // then
         result shouldHaveSize 3
@@ -64,10 +64,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-a", ":services:project-a"),
             ProjectMetadata("project-b", ":libs:project-b")
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.findProjectByName("project-a")
+        val result = monorepoProjects.findProjectByName("project-a")
 
         // then
         result shouldNotBe null
@@ -81,10 +81,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-a", ":services:project-a"),
             ProjectMetadata("project-b", ":libs:project-b")
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.findProjectByName(":libs:project-b")
+        val result = monorepoProjects.findProjectByName(":libs:project-b")
 
         // then
         result shouldNotBe null
@@ -97,10 +97,10 @@ class ChangedProjectsTest : FunSpec({
         val projects = listOf(
             ProjectMetadata("project-a", ":project-a")
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.findProjectByName("non-existent")
+        val result = monorepoProjects.findProjectByName("non-existent")
 
         // then
         result shouldBe null
@@ -113,10 +113,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-b", ":project-b", changedFiles = emptyList()),
             ProjectMetadata("project-c", ":project-c", changedFiles = listOf("file2.kt", "file3.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getProjectsWithDirectChanges()
+        val result = monorepoProjects.getProjectsWithDirectChanges()
 
         // then
         result shouldHaveSize 2
@@ -131,10 +131,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-b", ":project-b", changedFiles = emptyList()),
             ProjectMetadata("project-c", ":project-c", changedFiles = listOf("file2.kt", "file3.kt", "file4.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getChangedFileCountByProject()
+        val result = monorepoProjects.getChangedFileCountByProject()
 
         // then
         result.size shouldBe 2
@@ -149,10 +149,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-b", ":project-b", changedFiles = emptyList()),
             ProjectMetadata("project-c", ":project-c", changedFiles = listOf("file3.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getAllChangedFiles()
+        val result = monorepoProjects.getAllChangedFiles()
 
         // then
         result shouldHaveSize 3
@@ -166,10 +166,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-b", ":project-b", changedFiles = emptyList()),
             ProjectMetadata("project-c", ":project-c", changedFiles = listOf("file3.kt", "file4.kt", "file5.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val count = changedProjects.getTotalChangedFilesCount()
+        val count = monorepoProjects.getTotalChangedFilesCount()
 
         // then
         count shouldBe 5
@@ -181,10 +181,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-a", ":project-a", changedFiles = listOf("file1.kt")),
             ProjectMetadata("project-b", ":project-b", changedFiles = emptyList())
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // then
-        changedProjects.hasAnyChanges() shouldBe true
+        monorepoProjects.hasAnyChanges() shouldBe true
     }
 
     test("hasAnyChanges returns false when no projects have changes") {
@@ -193,10 +193,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-a", ":project-a", changedFiles = emptyList()),
             ProjectMetadata("project-b", ":project-b", changedFiles = emptyList())
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // then
-        changedProjects.hasAnyChanges() shouldBe false
+        monorepoProjects.hasAnyChanges() shouldBe false
     }
 
     test("getProjectsDependingOn returns projects that depend on given project") {
@@ -207,10 +207,10 @@ class ChangedProjectsTest : FunSpec({
         val serviceC = ProjectMetadata("service-c", ":service-c")
 
         val projects = listOf(commonLib, serviceA, serviceB, serviceC)
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getProjectsDependingOn(":common-lib")
+        val result = monorepoProjects.getProjectsDependingOn(":common-lib")
 
         // then
         result shouldHaveSize 2
@@ -224,10 +224,10 @@ class ChangedProjectsTest : FunSpec({
         val service = ProjectMetadata("service", ":service", dependencies = listOf(commonLib))
 
         val projects = listOf(baseLib, commonLib, service)
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getProjectsDependingOn(":base-lib")
+        val result = monorepoProjects.getProjectsDependingOn(":base-lib")
 
         // then
         result shouldHaveSize 2
@@ -240,10 +240,10 @@ class ChangedProjectsTest : FunSpec({
         val projectB = ProjectMetadata("project-b", ":project-b")
 
         val projects = listOf(projectA, projectB)
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getProjectsDependingOn("project-a")
+        val result = monorepoProjects.getProjectsDependingOn("project-a")
 
         // then
         result.shouldBeEmpty()
@@ -256,10 +256,10 @@ class ChangedProjectsTest : FunSpec({
         val standalone = ProjectMetadata("standalone", ":standalone", changedFiles = listOf("file3.kt"))
 
         val projects = listOf(lib, service, standalone)
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val summary = changedProjects.getSummary()
+        val summary = monorepoProjects.getSummary()
 
         // then
         summary.totalProjects shouldBe 3
@@ -279,23 +279,23 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("project-b", ":project-b", changedFiles = emptyList()),
             ProjectMetadata("project-c", ":project-c", changedFiles = listOf("file2.kt", "file3.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.toString()
+        val result = monorepoProjects.toString()
 
         // then
-        result shouldBe "ChangedProjects(total=3, changed=2, files=3)"
+        result shouldBe "MonorepoProjects(total=3, changed=2, files=3)"
     }
 
     test("empty project list") {
         // given
-        val changedProjects = ChangedProjects(emptyList())
+        val monorepoProjects = MonorepoProjects(emptyList())
 
         // then
-        changedProjects.getChangedProjectCount() shouldBe 0
-        changedProjects.getTotalChangedFilesCount() shouldBe 0
-        changedProjects.hasAnyChanges() shouldBe false
+        monorepoProjects.getChangedProjectCount() shouldBe 0
+        monorepoProjects.getTotalChangedFilesCount() shouldBe 0
+        monorepoProjects.hasAnyChanges() shouldBe false
     }
 
     test("getChangedProjectsWithPrefix returns affected projects matching prefix") {
@@ -306,10 +306,10 @@ class ChangedProjectsTest : FunSpec({
         val service = ProjectMetadata("api", ":services:api", changedFiles = listOf("file3.kt"))
 
         val projects = listOf(lib, app1, app2, service)
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val appsWithChanges = changedProjects.getChangedProjectsWithPrefix(":apps")
+        val appsWithChanges = monorepoProjects.getChangedProjectsWithPrefix(":apps")
 
         // then - should include app1 (depends on changed lib) and app2 (direct change)
         appsWithChanges shouldHaveSize 2
@@ -323,10 +323,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("app2", ":apps:app2", changedFiles = emptyList()),
             ProjectMetadata("app3", ":apps:app3", changedFiles = listOf("file2.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getChangedProjectsWithPrefix(":apps")
+        val result = monorepoProjects.getChangedProjectsWithPrefix(":apps")
 
         // then
         result shouldHaveSize 2
@@ -339,10 +339,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("lib1", ":libs:lib1", changedFiles = listOf("file1.kt")),
             ProjectMetadata("service", ":services:api", changedFiles = listOf("file2.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getChangedProjectsWithPrefix(":apps")
+        val result = monorepoProjects.getChangedProjectsWithPrefix(":apps")
 
         // then
         result.shouldBeEmpty()
@@ -355,10 +355,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("app2", ":apps:web:app2", changedFiles = listOf("file2.kt")),
             ProjectMetadata("lib1", ":libs:lib1", changedFiles = listOf("file3.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getChangedProjectNamesWithPrefix(":apps")
+        val result = monorepoProjects.getChangedProjectNamesWithPrefix(":apps")
 
         // then
         result shouldHaveSize 2
@@ -372,10 +372,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("app2", ":apps:web:app2", changedFiles = listOf("file2.kt")),
             ProjectMetadata("lib1", ":libs:lib1", changedFiles = listOf("file3.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getChangedProjectPathsWithPrefix(":apps")
+        val result = monorepoProjects.getChangedProjectPathsWithPrefix(":apps")
 
         // then
         result shouldHaveSize 2
@@ -388,10 +388,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("apps", ":apps", changedFiles = listOf("file1.kt")),
             ProjectMetadata("app1", ":apps:app1", changedFiles = listOf("file2.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getChangedProjectsWithPrefix(":apps")
+        val result = monorepoProjects.getChangedProjectsWithPrefix(":apps")
 
         // then
         result shouldHaveSize 2
@@ -404,10 +404,10 @@ class ChangedProjectsTest : FunSpec({
             ProjectMetadata("app1", ":Apps:app1", changedFiles = listOf("file1.kt")),
             ProjectMetadata("app2", ":apps:app2", changedFiles = listOf("file2.kt"))
         )
-        val changedProjects = ChangedProjects(projects)
+        val monorepoProjects = MonorepoProjects(projects)
 
         // when
-        val result = changedProjects.getChangedProjectsWithPrefix(":apps")
+        val result = monorepoProjects.getChangedProjectsWithPrefix(":apps")
 
         // then
         result shouldHaveSize 1

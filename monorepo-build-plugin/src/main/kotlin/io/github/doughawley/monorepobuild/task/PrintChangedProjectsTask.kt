@@ -39,9 +39,7 @@ abstract class PrintChangedProjectsTask : DefaultTask() {
 
         logger.lifecycle(ChangedProjectsPrinter(project.rootProject).buildReport(
             header = "Changed projects:",
-            allAffectedProjects = extension.allAffectedProjects,
-            changedFilesMap = extension.changedFilesMap,
-            metadataMap = extension.metadataMap
+            monorepoProjects = extension.monorepoProjects
         ))
     }
 }

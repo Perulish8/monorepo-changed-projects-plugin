@@ -1,10 +1,10 @@
 package io.github.doughawley.monorepobuild.domain
 
 /**
- * Represents a collection of changed projects with metadata.
- * Provides convenient methods to query and analyze changed projects.
+ * Represents a collection of all projects in the monorepo with their metadata.
+ * Provides convenient methods to query and analyze which projects have changed.
  */
-data class ChangedProjects(
+data class MonorepoProjects(
     val projects: List<ProjectMetadata>
 ) {
     /**
@@ -164,7 +164,7 @@ data class ChangedProjects(
     }
 
     override fun toString(): String {
-        return "ChangedProjects(total=${projects.size}, changed=${getChangedProjectCount()}, files=${getTotalChangedFilesCount()})"
+        return "MonorepoProjects(total=${projects.size}, changed=${getChangedProjectCount()}, files=${getTotalChangedFilesCount()})"
     }
 
     /**

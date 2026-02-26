@@ -1,13 +1,13 @@
 package io.github.doughawley.monorepobuild
 
-import io.github.doughawley.monorepobuild.domain.ProjectMetadata
+import io.github.doughawley.monorepobuild.domain.MonorepoProjects
 import org.gradle.api.Project
 
 /**
  * Formats the changed-projects report as a string.
  *
- * Responsible solely for formatting; callers supply the header and the three
- * data values needed to render the report, and decide how to output the result.
+ * Responsible solely for formatting; callers supply the header and the domain
+ * object, and decide how to output the result.
  */
 class ChangedProjectsPrinter(private val rootProject: Project) {
 
@@ -15,36 +15,35 @@ class ChangedProjectsPrinter(private val rootProject: Project) {
      * Builds the changed-projects report string.
      *
      * @param header The first line of the report (e.g. "Changed projects:" or "Changed projects (since abc123):")
-     * @param allAffectedProjects All project paths affected by the change (directly or transitively)
-     * @param changedFilesMap Map of project path to the files that changed directly in that project
-     * @param metadataMap Map of project path to its full metadata (used to resolve transitive "via" annotations)
+     * @param monorepoProjects All monorepo projects with their metadata and change information
      * @return The formatted report string ready to be passed to a logger
      */
     fun buildReport(
         header: String,
-        allAffectedProjects: Set<String>,
-        changedFilesMap: Map<String, List<String>>,
-        metadataMap: Map<String, ProjectMetadata>
+        monorepoProjects: MonorepoProjects
     ): String {
-        if (allAffectedProjects.isEmpty()) {
+        val changedProjectPaths = monorepoProjects.getChangedProjectPaths().toSet()
+        if (changedProjectPaths.isEmpty()) {
             return "No projects have changed."
         }
 
-        val directlyChanged = changedFilesMap.keys
-            .filter { it in allAffectedProjects }
-            .sorted()
+        val directlyChangedPaths = monorepoProjects.getProjectsWithDirectChanges()
+            .map { it.fullyQualifiedName }
+            .toSet()
 
-        val transitivelyAffected = allAffectedProjects
-            .filter { it !in changedFilesMap.keys }
+        val directlyChanged = directlyChangedPaths.sorted()
+        val transitivelyAffected = changedProjectPaths
+            .filter { it !in directlyChangedPaths }
             .sorted()
 
         val sb = StringBuilder()
         sb.appendLine(header)
 
         directlyChanged.forEach { projectPath ->
+            val project = monorepoProjects.projects.find { it.fullyQualifiedName == projectPath }
+            val files = buildDisplayFiles(projectPath, project?.changedFiles.orEmpty())
             sb.appendLine()
             sb.appendLine("  $projectPath")
-            val files = buildDisplayFiles(projectPath, changedFilesMap)
             files.take(FILE_DISPLAY_LIMIT).forEach { sb.appendLine("    - $it") }
             if (files.size > FILE_DISPLAY_LIMIT) {
                 sb.appendLine("    ... and ${files.size - FILE_DISPLAY_LIMIT} more")
@@ -55,7 +54,7 @@ class ChangedProjectsPrinter(private val rootProject: Project) {
             sb.appendLine()
             val maxPathLen = transitivelyAffected.maxOf { it.length }
             transitivelyAffected.forEach { projectPath ->
-                val via = metadataMap[projectPath]
+                val via = monorepoProjects.projects.find { it.fullyQualifiedName == projectPath }
                     ?.dependencies
                     ?.filter { it.hasChanges() }
                     ?.map { it.fullyQualifiedName }
@@ -70,8 +69,7 @@ class ChangedProjectsPrinter(private val rootProject: Project) {
         return sb.toString().trimEnd()
     }
 
-    private fun buildDisplayFiles(projectPath: String, changedFilesMap: Map<String, List<String>>): List<String> {
-        val files = changedFilesMap[projectPath].orEmpty()
+    private fun buildDisplayFiles(projectPath: String, files: List<String>): List<String> {
         val projectDir = rootProject.findProject(projectPath)
             ?.projectDir
             ?.relativeTo(rootProject.rootDir)

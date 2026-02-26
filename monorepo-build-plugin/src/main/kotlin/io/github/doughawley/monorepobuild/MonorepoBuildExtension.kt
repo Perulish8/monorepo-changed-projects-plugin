@@ -1,6 +1,6 @@
 package io.github.doughawley.monorepobuild
 
-import io.github.doughawley.monorepobuild.domain.ProjectMetadata
+import io.github.doughawley.monorepobuild.domain.MonorepoProjects
 import java.util.concurrent.atomic.AtomicBoolean
 
 /**
@@ -38,11 +38,10 @@ open class MonorepoBuildExtension {
     var excludePatterns: List<String> = listOf()
 
     /**
-     * Metadata map computed during configuration phase.
-     * Maps project paths to their metadata including dependencies and changed files.
+     * All monorepo projects with their metadata and change information.
      * Available after configuration phase completes.
      */
-    var metadataMap: Map<String, ProjectMetadata> = emptyMap()
+    var monorepoProjects: MonorepoProjects = MonorepoProjects(emptyList())
         internal set
 
     /**
@@ -50,13 +49,6 @@ open class MonorepoBuildExtension {
      * Available after configuration phase completes.
      */
     var allAffectedProjects: Set<String> = emptySet()
-        internal set
-
-    /**
-     * Map of changed files by project path.
-     * Available after configuration phase completes.
-     */
-    var changedFilesMap: Map<String, List<String>> = emptyMap()
         internal set
 
     /**

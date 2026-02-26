@@ -33,9 +33,7 @@ abstract class PrintChangedProjectsFromRefTask : DefaultTask() {
         val resolvedRef = extension.commitRef
         logger.lifecycle(ChangedProjectsPrinter(project.rootProject).buildReport(
             header = "Changed projects (since $resolvedRef):",
-            allAffectedProjects = extension.allAffectedProjects,
-            changedFilesMap = extension.changedFilesMap,
-            metadataMap = extension.metadataMap
+            monorepoProjects = extension.monorepoProjects
         ))
     }
 }
