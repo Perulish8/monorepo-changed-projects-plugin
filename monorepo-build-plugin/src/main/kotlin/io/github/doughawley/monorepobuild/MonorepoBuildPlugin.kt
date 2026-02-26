@@ -1,5 +1,6 @@
 package io.github.doughawley.monorepobuild
 
+import io.github.doughawley.monorepobuild.domain.MonorepoProjects
 import io.github.doughawley.monorepobuild.domain.ProjectFileMapper
 import io.github.doughawley.monorepobuild.domain.ProjectMetadataFactory
 import io.github.doughawley.monorepobuild.git.GitChangedFilesDetector
@@ -273,28 +274,25 @@ class MonorepoBuildPlugin @Inject constructor(
         // Build metadata with changed files information
         val metadataMap = metadataFactory.buildProjectMetadataMap(project.rootProject, filteredChangedFilesMap)
 
+        // Store monorepo projects as the canonical domain object
+        val monorepoProjects = MonorepoProjects(metadataMap.values.toList())
+        extension.monorepoProjects = monorepoProjects
+
         // Get all affected projects (those with changes OR dependency changes).
         // ":" is Gradle's path for the root project — it has no dedicated build task
         // and is intentionally excluded from the affected project list.
         // Projects without a build file (build.gradle or build.gradle.kts) are also
         // excluded as they cannot be built directly.
-        val allAffectedProjects = metadataMap.values
-            .filter { metadata ->
-                metadata.hasChanges() &&
-                metadata.fullyQualifiedName != ":" &&
-                hasBuildFile(project.rootProject, metadata.fullyQualifiedName).also { hasBuild ->
+        val allAffectedProjects = monorepoProjects.getChangedProjectPaths()
+            .filter { path ->
+                path != ":" && hasBuildFile(project.rootProject, path).also { hasBuild ->
                     if (!hasBuild) {
-                        logger.debug("Excluding ${metadata.fullyQualifiedName} from affected projects: no build file found")
+                        logger.debug("Excluding $path from affected projects: no build file found")
                     }
                 }
             }
-            .map { it.fullyQualifiedName }
             .toSet()
-
-        // Store in extension for access during configuration and execution
-        extension.metadataMap = metadataMap
         extension.allAffectedProjects = allAffectedProjects
-        extension.changedFilesMap = filteredChangedFilesMap
 
         logger.info("Changed files count: ${changedFiles.size}")
         logger.info("All affected projects (including dependents): ${allAffectedProjects.joinToString(", ").ifEmpty { "none" }}")

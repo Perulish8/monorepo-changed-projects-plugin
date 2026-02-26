@@ -1,5 +1,6 @@
 package io.github.doughawley.monorepobuild
 
+import io.github.doughawley.monorepobuild.domain.MonorepoProjects
 import io.github.doughawley.monorepobuild.domain.ProjectMetadata
 import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.shouldBe
@@ -17,9 +18,7 @@ class ChangedProjectsPrinterTest : FunSpec({
         // when
         val result = printer.buildReport(
             header = "Changed projects:",
-            allAffectedProjects = emptySet(),
-            changedFilesMap = emptyMap(),
-            metadataMap = emptyMap()
+            monorepoProjects = MonorepoProjects(emptyList())
         )
 
         // then
@@ -31,13 +30,12 @@ class ChangedProjectsPrinterTest : FunSpec({
         val rootProject = ProjectBuilder.builder().build()
         ProjectBuilder.builder().withParent(rootProject).withName("api").build()
         val printer = ChangedProjectsPrinter(rootProject)
+        val apiMetadata = ProjectMetadata("api", ":api", changedFiles = listOf("api/src/main/kotlin/Api.kt"))
 
         // when
         val result = printer.buildReport(
             header = "Changed projects (since abc123):",
-            allAffectedProjects = setOf(":api"),
-            changedFilesMap = mapOf(":api" to listOf("api/src/main/kotlin/Api.kt")),
-            metadataMap = mapOf(":api" to ProjectMetadata("api", ":api", changedFiles = listOf("api/src/main/kotlin/Api.kt")))
+            monorepoProjects = MonorepoProjects(listOf(apiMetadata))
         )
 
         // then
@@ -49,13 +47,12 @@ class ChangedProjectsPrinterTest : FunSpec({
         val rootProject = ProjectBuilder.builder().build()
         ProjectBuilder.builder().withParent(rootProject).withName("api").build()
         val printer = ChangedProjectsPrinter(rootProject)
+        val apiMetadata = ProjectMetadata("api", ":api", changedFiles = listOf("api/src/main/kotlin/Api.kt"))
 
         // when
         val result = printer.buildReport(
             header = "Changed projects:",
-            allAffectedProjects = setOf(":api"),
-            changedFilesMap = mapOf(":api" to listOf("api/src/main/kotlin/Api.kt")),
-            metadataMap = mapOf(":api" to ProjectMetadata("api", ":api", changedFiles = listOf("api/src/main/kotlin/Api.kt")))
+            monorepoProjects = MonorepoProjects(listOf(apiMetadata))
         )
 
         // then
@@ -68,13 +65,12 @@ class ChangedProjectsPrinterTest : FunSpec({
         val rootProject = ProjectBuilder.builder().build()
         ProjectBuilder.builder().withParent(rootProject).withName("api").build()
         val printer = ChangedProjectsPrinter(rootProject)
+        val apiMetadata = ProjectMetadata("api", ":api", changedFiles = listOf("api/src/main/kotlin/Api.kt"))
 
         // when
         val result = printer.buildReport(
             header = "Changed projects:",
-            allAffectedProjects = setOf(":api"),
-            changedFilesMap = mapOf(":api" to listOf("api/src/main/kotlin/Api.kt")),
-            metadataMap = mapOf(":api" to ProjectMetadata("api", ":api", changedFiles = listOf("api/src/main/kotlin/Api.kt")))
+            monorepoProjects = MonorepoProjects(listOf(apiMetadata))
         )
 
         // then — "api/" prefix is stripped because the project dir is resolved relative to rootDir
@@ -103,9 +99,7 @@ class ChangedProjectsPrinterTest : FunSpec({
         // when
         val result = printer.buildReport(
             header = "Changed projects:",
-            allAffectedProjects = setOf(":api", ":app"),
-            changedFilesMap = mapOf(":api" to listOf("api/src/main/kotlin/Api.kt")),
-            metadataMap = mapOf(":api" to apiMetadata, ":app" to appMetadata)
+            monorepoProjects = MonorepoProjects(listOf(apiMetadata, appMetadata))
         )
 
         // then
@@ -125,9 +119,7 @@ class ChangedProjectsPrinterTest : FunSpec({
         // when
         val result = printer.buildReport(
             header = "Changed projects:",
-            allAffectedProjects = setOf(":api"),
-            changedFilesMap = mapOf(":api" to manyFiles),
-            metadataMap = mapOf(":api" to ProjectMetadata("api", ":api", changedFiles = manyFiles))
+            monorepoProjects = MonorepoProjects(listOf(ProjectMetadata("api", ":api", changedFiles = manyFiles)))
         )
 
         // then
@@ -140,19 +132,13 @@ class ChangedProjectsPrinterTest : FunSpec({
         ProjectBuilder.builder().withParent(rootProject).withName("beta").build()
         ProjectBuilder.builder().withParent(rootProject).withName("alpha").build()
         val printer = ChangedProjectsPrinter(rootProject)
+        val alphaMetadata = ProjectMetadata("alpha", ":alpha", changedFiles = listOf("alpha/src/main/kotlin/Alpha.kt"))
+        val betaMetadata = ProjectMetadata("beta", ":beta", changedFiles = listOf("beta/src/main/kotlin/Beta.kt"))
 
         // when
         val result = printer.buildReport(
             header = "Changed projects:",
-            allAffectedProjects = setOf(":alpha", ":beta"),
-            changedFilesMap = mapOf(
-                ":beta" to listOf("beta/src/main/kotlin/Beta.kt"),
-                ":alpha" to listOf("alpha/src/main/kotlin/Alpha.kt")
-            ),
-            metadataMap = mapOf(
-                ":alpha" to ProjectMetadata("alpha", ":alpha", changedFiles = listOf("alpha/src/main/kotlin/Alpha.kt")),
-                ":beta" to ProjectMetadata("beta", ":beta", changedFiles = listOf("beta/src/main/kotlin/Beta.kt"))
-            )
+            monorepoProjects = MonorepoProjects(listOf(alphaMetadata, betaMetadata))
         )
 
         // then
