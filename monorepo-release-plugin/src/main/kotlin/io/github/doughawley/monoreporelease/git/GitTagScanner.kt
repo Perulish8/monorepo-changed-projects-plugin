@@ -1,5 +1,6 @@
 package io.github.doughawley.monoreporelease.git
 
+import io.github.doughawley.monorepocore.git.GitCommandExecutor
 import io.github.doughawley.monoreporelease.domain.SemanticVersion
 import io.github.doughawley.monoreporelease.domain.TagPattern
 import java.io.File

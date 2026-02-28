@@ -1,5 +1,6 @@
 package io.github.doughawley.monoreporelease.git
 
+import io.github.doughawley.monorepocore.git.GitCommandExecutor
 import org.gradle.api.GradleException
 import org.gradle.api.logging.Logger
 import java.io.File

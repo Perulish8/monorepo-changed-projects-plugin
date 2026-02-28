@@ -1,6 +1,6 @@
 package io.github.doughawley.monoreporelease
 
-import io.github.doughawley.monoreporelease.git.GitCommandExecutor
+import io.github.doughawley.monorepocore.git.GitCommandExecutor
 import io.github.doughawley.monoreporelease.git.GitReleaseExecutor
 import io.github.doughawley.monoreporelease.git.GitTagScanner
 import io.github.doughawley.monoreporelease.task.ReleaseTask
