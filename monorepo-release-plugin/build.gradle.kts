@@ -13,12 +13,31 @@ repositories {
     gradlePluginPortal()
 }
 
+// Classes bundled into the plugin jar; not exposed as a POM dependency
+val embed by configurations.creating {
+    isTransitive = false
+}
+
 dependencies {
     implementation(kotlin("stdlib"))
-    implementation(project(":monorepo-plugin-core"))
+    embed(project(":monorepo-plugin-core"))
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("io.kotest:kotest-property:5.9.1")
+}
+
+// Make embedded classes available for compilation, runtime, and all test source sets
+// (compileClasspath/runtimeClasspath are not published in the POM)
+configurations {
+    compileClasspath { extendsFrom(embed) }
+    runtimeClasspath { extendsFrom(embed) }
+}
+
+// Bundle embedded jar contents directly into the plugin jar
+tasks.named<Jar>("jar") {
+    dependsOn(embed)
+    from(embed.map { if (it.isDirectory) it else zipTree(it) })
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 }
 
 // Configure source sets for unit and functional tests
