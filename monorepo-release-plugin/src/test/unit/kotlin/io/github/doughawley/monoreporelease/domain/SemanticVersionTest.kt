@@ -1,6 +1,7 @@
 package io.github.doughawley.monoreporelease.domain
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.datatest.withData
 import io.kotest.matchers.comparables.shouldBeGreaterThan
 import io.kotest.matchers.comparables.shouldBeLessThan
 import io.kotest.matchers.nulls.shouldBeNull
@@ -8,132 +9,83 @@ import io.kotest.matchers.shouldBe
 
 class SemanticVersionTest : FunSpec({
 
-    test("should parse version with v prefix") {
-        // given
-        val raw = "v1.2.3"
-        // when
-        val result = SemanticVersion.parse(raw)
-        // then
-        result shouldBe SemanticVersion(1, 2, 3)
+    context("parse returns SemanticVersion for valid input") {
+        withData(
+            "v1.2.3" to SemanticVersion(1, 2, 3),
+            "1.2.3" to SemanticVersion(1, 2, 3),
+            "0.0.0" to SemanticVersion(0, 0, 0),
+        ) { (input, expected) ->
+            SemanticVersion.parse(input) shouldBe expected
+        }
     }
 
-    test("should parse version without v prefix") {
-        // given
-        val raw = "1.2.3"
-        // when
-        val result = SemanticVersion.parse(raw)
-        // then
-        result shouldBe SemanticVersion(1, 2, 3)
+    context("parse returns null for invalid input") {
+        withData(
+            nameFn = { if (it.isEmpty()) "(empty string)" else it },
+            "not-a-version", "1.2", "1.2.3.4", "", "a.b.c",
+        ) { input ->
+            SemanticVersion.parse(input).shouldBeNull()
+        }
     }
 
-    test("should parse version with zeros") {
-        // given
-        val raw = "0.0.0"
-        // when
-        val result = SemanticVersion.parse(raw)
-        // then
-        result shouldBe SemanticVersion(0, 0, 0)
+    context("bump MAJOR resets minor and patch to zero") {
+        withData(
+            SemanticVersion(1, 2, 3) to SemanticVersion(2, 0, 0),
+            SemanticVersion(0, 0, 0) to SemanticVersion(1, 0, 0),
+        ) { (version, expected) ->
+            version.bump(Scope.MAJOR) shouldBe expected
+        }
     }
 
-    test("should return null for invalid format") {
-        // given / when / then
-        SemanticVersion.parse("not-a-version") shouldBe null
-        SemanticVersion.parse("1.2") shouldBe null
-        SemanticVersion.parse("1.2.3.4") shouldBe null
-        SemanticVersion.parse("") shouldBe null
-        SemanticVersion.parse("a.b.c") shouldBe null
+    context("bump MINOR resets patch to zero") {
+        withData(
+            SemanticVersion(1, 2, 3) to SemanticVersion(1, 3, 0),
+            SemanticVersion(0, 0, 0) to SemanticVersion(0, 1, 0),
+        ) { (version, expected) ->
+            version.bump(Scope.MINOR) shouldBe expected
+        }
     }
 
-    test("should return null for empty string") {
-        SemanticVersion.parse("").shouldBeNull()
+    context("bump PATCH increments patch only") {
+        withData(
+            SemanticVersion(1, 2, 3) to SemanticVersion(1, 2, 4),
+            SemanticVersion(0, 0, 0) to SemanticVersion(0, 0, 1),
+        ) { (version, expected) ->
+            version.bump(Scope.PATCH) shouldBe expected
+        }
     }
 
-    test("bump MAJOR resets minor and patch to zero") {
-        // given
-        val version = SemanticVersion(1, 2, 3)
-        // when
-        val result = version.bump(Scope.MAJOR)
-        // then
-        result shouldBe SemanticVersion(2, 0, 0)
-    }
-
-    test("bump MINOR resets patch to zero") {
-        // given
-        val version = SemanticVersion(1, 2, 3)
-        // when
-        val result = version.bump(Scope.MINOR)
-        // then
-        result shouldBe SemanticVersion(1, 3, 0)
-    }
-
-    test("bump PATCH increments patch only") {
-        // given
-        val version = SemanticVersion(1, 2, 3)
-        // when
-        val result = version.bump(Scope.PATCH)
-        // then
-        result shouldBe SemanticVersion(1, 2, 4)
-    }
-
-    test("bump from 0.0.0 MAJOR gives 1.0.0") {
-        SemanticVersion(0, 0, 0).bump(Scope.MAJOR) shouldBe SemanticVersion(1, 0, 0)
-    }
-
-    test("bump from 0.0.0 MINOR gives 0.1.0") {
-        SemanticVersion(0, 0, 0).bump(Scope.MINOR) shouldBe SemanticVersion(0, 1, 0)
-    }
-
-    test("comparison: higher major wins") {
-        // given
-        val lower = SemanticVersion(1, 9, 9)
-        val higher = SemanticVersion(2, 0, 0)
-        // then
-        higher shouldBeGreaterThan lower
-        lower shouldBeLessThan higher
-    }
-
-    test("comparison: higher minor wins when major equal") {
-        val lower = SemanticVersion(1, 2, 9)
-        val higher = SemanticVersion(1, 3, 0)
-        higher shouldBeGreaterThan lower
-    }
-
-    test("comparison: higher patch wins when major and minor equal") {
-        val lower = SemanticVersion(1, 2, 3)
-        val higher = SemanticVersion(1, 2, 4)
-        higher shouldBeGreaterThan lower
+    context("higher version is greater than lower") {
+        withData(
+            SemanticVersion(1, 9, 9) to SemanticVersion(2, 0, 0),  // major wins
+            SemanticVersion(1, 2, 9) to SemanticVersion(1, 3, 0),  // minor wins
+            SemanticVersion(1, 2, 3) to SemanticVersion(1, 2, 4),  // patch wins
+        ) { (lower, higher) ->
+            higher shouldBeGreaterThan lower
+            lower shouldBeLessThan higher
+        }
     }
 
     test("equal versions compare as equal") {
-        val v1 = SemanticVersion(1, 2, 3)
-        val v2 = SemanticVersion(1, 2, 3)
-        v1.compareTo(v2) shouldBe 0
+        SemanticVersion(1, 2, 3).compareTo(SemanticVersion(1, 2, 3)) shouldBe 0
     }
 
     test("max selection picks correct version from list") {
-        // given
         val versions = listOf(
             SemanticVersion(0, 1, 0),
             SemanticVersion(0, 2, 0),
             SemanticVersion(0, 1, 5),
             SemanticVersion(1, 0, 0)
         )
-        // when
-        val max = versions.max()
-        // then
-        max shouldBe SemanticVersion(1, 0, 0)
+        versions.max() shouldBe SemanticVersion(1, 0, 0)
     }
 
-    test("toString returns major.minor.patch without v prefix") {
-        // given
-        val version = SemanticVersion(1, 2, 3)
-        // when
-        val result = version.toString()
-        // then
-        result shouldBe "1.2.3"
-    }
-
-    test("toString for 0.0.0") {
-        SemanticVersion(0, 0, 0).toString() shouldBe "0.0.0"
+    context("toString produces major.minor.patch without v prefix") {
+        withData(
+            SemanticVersion(1, 2, 3) to "1.2.3",
+            SemanticVersion(0, 0, 0) to "0.0.0",
+        ) { (version, expected) ->
+            version.toString() shouldBe expected
+        }
     }
 })
