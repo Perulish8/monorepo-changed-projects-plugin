@@ -1,30 +1,32 @@
 package io.github.doughawley.monoreporelease.domain
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.datatest.withData
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 
 class ScopeTest : FunSpec({
 
-    test("fromString returns MAJOR for 'major' case-insensitively") {
-        Scope.fromString("major") shouldBe Scope.MAJOR
-        Scope.fromString("MAJOR") shouldBe Scope.MAJOR
-        Scope.fromString("Major") shouldBe Scope.MAJOR
+    context("fromString maps recognised strings to the correct scope") {
+        withData(
+            "major" to Scope.MAJOR,
+            "MAJOR" to Scope.MAJOR,
+            "Major" to Scope.MAJOR,
+            "minor" to Scope.MINOR,
+            "MINOR" to Scope.MINOR,
+            "patch" to Scope.PATCH,
+            "PATCH" to Scope.PATCH,
+        ) { (input, expected) ->
+            Scope.fromString(input) shouldBe expected
+        }
     }
 
-    test("fromString returns MINOR for 'minor' case-insensitively") {
-        Scope.fromString("minor") shouldBe Scope.MINOR
-        Scope.fromString("MINOR") shouldBe Scope.MINOR
-    }
-
-    test("fromString returns PATCH for 'patch' case-insensitively") {
-        Scope.fromString("patch") shouldBe Scope.PATCH
-        Scope.fromString("PATCH") shouldBe Scope.PATCH
-    }
-
-    test("fromString returns null for unrecognised input") {
-        Scope.fromString("release").shouldBeNull()
-        Scope.fromString("hotfix").shouldBeNull()
-        Scope.fromString("").shouldBeNull()
+    context("fromString returns null for unrecognised input") {
+        withData(
+            nameFn = { if (it.isEmpty()) "(empty string)" else it },
+            "release", "hotfix", "",
+        ) { input ->
+            Scope.fromString(input).shouldBeNull()
+        }
     }
 })

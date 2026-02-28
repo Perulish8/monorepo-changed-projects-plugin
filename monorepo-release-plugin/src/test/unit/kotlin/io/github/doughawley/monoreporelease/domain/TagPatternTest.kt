@@ -1,58 +1,45 @@
 package io.github.doughawley.monoreporelease.domain
 
 import io.kotest.core.spec.style.FunSpec
+import io.kotest.datatest.withData
 import io.kotest.matchers.nulls.shouldBeNull
 import io.kotest.matchers.shouldBe
 
+private data class FormatTagCase(
+    val globalPrefix: String,
+    val projectPrefix: String,
+    val version: SemanticVersion,
+    val expected: String
+)
+
 class TagPatternTest : FunSpec({
 
-    test("formatTag produces globalPrefix/projectPrefix/vVersion") {
-        // given
-        val version = SemanticVersion(1, 2, 0)
-        // when
-        val tag = TagPattern.formatTag("release", "api", version)
-        // then
-        tag shouldBe "release/api/v1.2.0"
+    context("formatTag produces globalPrefix/projectPrefix/vVersion") {
+        withData(
+            FormatTagCase("release", "api", SemanticVersion(1, 2, 0), "release/api/v1.2.0"),
+            FormatTagCase("custom-prefix", "service", SemanticVersion(0, 1, 0), "custom-prefix/service/v0.1.0"),
+        ) { (globalPrefix, projectPrefix, version, expected) ->
+            TagPattern.formatTag(globalPrefix, projectPrefix, version) shouldBe expected
+        }
     }
 
-    test("formatTag with custom global prefix") {
-        val version = SemanticVersion(0, 1, 0)
-        TagPattern.formatTag("custom-prefix", "service", version) shouldBe "custom-prefix/service/v0.1.0"
+    context("formatReleaseBranch produces release/projectPrefix/vMajor.Minor.x") {
+        withData(
+            Triple("api", SemanticVersion(1, 2, 0), "release/api/v1.2.x"),
+            Triple("app", SemanticVersion(0, 1, 0), "release/app/v0.1.x"),
+        ) { (projectPrefix, version, expected) ->
+            TagPattern.formatReleaseBranch(projectPrefix, version) shouldBe expected
+        }
     }
 
-    test("formatReleaseBranch produces release/projectPrefix/vMajor.Minor.x") {
-        // given
-        val version = SemanticVersion(1, 2, 0)
-        // when
-        val branch = TagPattern.formatReleaseBranch("api", version)
-        // then
-        branch shouldBe "release/api/v1.2.x"
-    }
-
-    test("formatReleaseBranch for v0.1.0") {
-        TagPattern.formatReleaseBranch("app", SemanticVersion(0, 1, 0)) shouldBe "release/app/v0.1.x"
-    }
-
-    test("deriveProjectTagPrefix strips leading colon for single-level path") {
-        // given
-        val gradlePath = ":api"
-        // when
-        val prefix = TagPattern.deriveProjectTagPrefix(gradlePath)
-        // then
-        prefix shouldBe "api"
-    }
-
-    test("deriveProjectTagPrefix replaces inner colons with dashes for nested path") {
-        // given
-        val gradlePath = ":services:auth"
-        // when
-        val prefix = TagPattern.deriveProjectTagPrefix(gradlePath)
-        // then
-        prefix shouldBe "services-auth"
-    }
-
-    test("deriveProjectTagPrefix for three-level path") {
-        TagPattern.deriveProjectTagPrefix(":a:b:c") shouldBe "a-b-c"
+    context("deriveProjectTagPrefix strips leading colon and replaces inner colons with dashes") {
+        withData(
+            ":api" to "api",
+            ":services:auth" to "services-auth",
+            ":a:b:c" to "a-b-c",
+        ) { (gradlePath, expected) ->
+            TagPattern.deriveProjectTagPrefix(gradlePath) shouldBe expected
+        }
     }
 
     test("parseVersionFromTag round-trips with formatTag") {
@@ -65,63 +52,37 @@ class TagPatternTest : FunSpec({
         parsed shouldBe version
     }
 
-    test("parseVersionFromTag returns null for wrong prefix") {
-        // given
-        val tag = "other/app/v1.0.0"
-        // when
-        val result = TagPattern.parseVersionFromTag(tag, "release", "app")
-        // then
-        result.shouldBeNull()
+    context("parseVersionFromTag returns null for mismatched or malformed tags") {
+        withData(
+            "other/app/v1.0.0",             // wrong global prefix
+            "release/other-project/v1.0.0", // wrong project prefix
+            "release/app/vnotaversion",      // malformed version
+        ) { tag ->
+            TagPattern.parseVersionFromTag(tag, "release", "app").shouldBeNull()
+        }
     }
 
-    test("parseVersionFromTag returns null for wrong project prefix") {
-        val tag = "release/other-project/v1.0.0"
-        TagPattern.parseVersionFromTag(tag, "release", "app").shouldBeNull()
+    context("isReleaseBranch") {
+        withData(
+            "release/api/v1.2.x" to true,
+            "release/services-auth/v0.1.x" to true,
+            "main" to false,
+            "master" to false,
+            "feature/my-feature" to false,
+            "release/api/v1.2.0" to false,  // tag pattern, not branch
+        ) { (branch, expected) ->
+            TagPattern.isReleaseBranch(branch) shouldBe expected
+        }
     }
 
-    test("parseVersionFromTag returns null for malformed version") {
-        val tag = "release/app/vnotaversion"
-        TagPattern.parseVersionFromTag(tag, "release", "app").shouldBeNull()
-    }
-
-    test("isReleaseBranch returns true for valid release branch") {
-        TagPattern.isReleaseBranch("release/api/v1.2.x") shouldBe true
-    }
-
-    test("isReleaseBranch returns true for nested project release branch") {
-        TagPattern.isReleaseBranch("release/services-auth/v0.1.x") shouldBe true
-    }
-
-    test("isReleaseBranch returns false for main") {
-        TagPattern.isReleaseBranch("main") shouldBe false
-    }
-
-    test("isReleaseBranch returns false for master") {
-        TagPattern.isReleaseBranch("master") shouldBe false
-    }
-
-    test("isReleaseBranch returns false for feature branch") {
-        TagPattern.isReleaseBranch("feature/my-feature") shouldBe false
-    }
-
-    test("isReleaseBranch returns false for a release tag (not a branch pattern)") {
-        // "release/api/v1.2.0" has no .x suffix — that's a tag, not a branch
-        TagPattern.isReleaseBranch("release/api/v1.2.0") shouldBe false
-    }
-
-    test("parseVersionLineFromBranch extracts major and minor") {
-        // given
-        val branch = "release/api/v0.2.x"
-        // when
-        val (major, minor) = TagPattern.parseVersionLineFromBranch(branch)
-        // then
-        major shouldBe 0
-        minor shouldBe 2
-    }
-
-    test("parseVersionLineFromBranch for v1.10.x") {
-        val (major, minor) = TagPattern.parseVersionLineFromBranch("release/app/v1.10.x")
-        major shouldBe 1
-        minor shouldBe 10
+    context("parseVersionLineFromBranch extracts major and minor") {
+        withData(
+            Triple("release/api/v0.2.x", 0, 2),
+            Triple("release/app/v1.10.x", 1, 10),
+        ) { (branch, expectedMajor, expectedMinor) ->
+            val (major, minor) = TagPattern.parseVersionLineFromBranch(branch)
+            major shouldBe expectedMajor
+            minor shouldBe expectedMinor
+        }
     }
 })
