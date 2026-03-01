@@ -54,6 +54,14 @@ sourceSets {
         runtimeClasspath += output + compileClasspath
     }
 
+    val integrationTest by creating {
+        kotlin {
+            srcDir("src/test/integration/kotlin")
+        }
+        compileClasspath += sourceSets.main.get().output + configurations.testRuntimeClasspath.get()
+        runtimeClasspath += output + compileClasspath
+    }
+
     val functionalTest by creating {
         kotlin {
             srcDir("src/test/functional/kotlin")
@@ -75,6 +83,11 @@ dependencies {
     add("unitTestImplementation", "io.kotest:kotest-framework-datatest:5.9.1")
     add("unitTestImplementation", "io.mockk:mockk:1.13.12")
 
+    // Integration test dependencies
+    add("integrationTestImplementation", "io.kotest:kotest-runner-junit5:5.9.1")
+    add("integrationTestImplementation", "io.kotest:kotest-assertions-core:5.9.1")
+    add("integrationTestImplementation", "io.mockk:mockk:1.13.12")
+
     // Functional test dependencies
     add("functionalTestImplementation", gradleTestKit())
     add("functionalTestImplementation", "io.kotest:kotest-runner-junit5:5.9.1")
@@ -91,6 +104,17 @@ val unitTest by tasks.registering(Test::class) {
     outputs.upToDateWhen { false }
 }
 
+// Register integration test task
+val integrationTest by tasks.registering(Test::class) {
+    description = "Runs integration tests against a real git backend"
+    group = "verification"
+    testClassesDirs = sourceSets["integrationTest"].output.classesDirs
+    classpath = sourceSets["integrationTest"].runtimeClasspath
+    useJUnitPlatform()
+    outputs.upToDateWhen { false }
+    shouldRunAfter(unitTest)
+}
+
 // Register functional test task
 val functionalTest by tasks.registering(Test::class) {
     description = "Runs functional tests"
@@ -99,13 +123,13 @@ val functionalTest by tasks.registering(Test::class) {
     classpath = sourceSets["functionalTest"].runtimeClasspath
     useJUnitPlatform()
     outputs.upToDateWhen { false }
-    shouldRunAfter(unitTest)
+    shouldRunAfter(unitTest, integrationTest)
     maxParallelForks = (Runtime.getRuntime().availableProcessors() / 2).coerceAtLeast(1)
 }
 
-// Make check depend on both test types
+// Make check depend on all test types
 tasks.named("check") {
-    dependsOn(unitTest, functionalTest)
+    dependsOn(unitTest, integrationTest, functionalTest)
 }
 
 tasks.withType<Test>().configureEach {
