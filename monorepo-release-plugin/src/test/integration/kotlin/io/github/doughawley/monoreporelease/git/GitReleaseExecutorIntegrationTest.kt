@@ -135,35 +135,36 @@ class GitReleaseExecutorIntegrationTest : FunSpec({
         ex.message shouldContain "release/app/v1.0.x"
     }
 
-    // pushTagAndBranch
+    // pushTag / pushBranch
 
-    test("pushTagAndBranch pushes only the tag to remote when branch is null") {
+    test("pushTag pushes the tag to remote") {
         // given
         executor().createTagLocally("release/app/v1.0.0")
 
         // when
-        executor().pushTagAndBranch("release/app/v1.0.0", null)
+        executor().pushTag("release/app/v1.0.0")
 
         // then
         repoListener.repo.remoteTagExists("release/app/v1.0.0") shouldBe true
     }
 
-    test("pushTagAndBranch does not push a branch when branch is null") {
+    test("pushTag does not push any branch") {
         // given
         executor().createTagLocally("release/app/v1.0.0")
-        executor().pushTagAndBranch("release/app/v1.0.0", null)
+        executor().pushTag("release/app/v1.0.0")
 
         // then
         repoListener.repo.remoteBranchExists("release/app/v1.0.x") shouldBe false
     }
 
-    test("pushTagAndBranch pushes both tag and branch to remote in one call") {
+    test("pushTag and pushBranch together push both tag and branch to remote") {
         // given
         executor().createTagLocally("release/app/v1.0.0")
         executor().createBranchLocally("release/app/v1.0.x")
 
         // when
-        executor().pushTagAndBranch("release/app/v1.0.0", "release/app/v1.0.x")
+        executor().pushTag("release/app/v1.0.0")
+        executor().pushBranch("release/app/v1.0.x")
 
         // then
         repoListener.repo.remoteTagExists("release/app/v1.0.0") shouldBe true
@@ -194,7 +195,7 @@ class GitReleaseExecutorIntegrationTest : FunSpec({
     test("deleteLocalTag does not affect a tag that was pushed to remote") {
         // given
         executor().createTagLocally("release/app/v1.0.0")
-        executor().pushTagAndBranch("release/app/v1.0.0", null)
+        executor().pushTag("release/app/v1.0.0")
 
         // when
         executor().deleteLocalTag("release/app/v1.0.0")
