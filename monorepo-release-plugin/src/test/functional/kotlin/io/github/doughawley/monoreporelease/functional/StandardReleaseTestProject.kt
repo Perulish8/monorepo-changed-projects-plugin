@@ -97,6 +97,105 @@ object StandardReleaseTestProject {
         project.pushToRemote()
         return project
     }
+
+    /**
+     * Creates a multi-project test setup with root, :app, and :lib subprojects.
+     * Both subprojects opt in to releases by default.
+     *
+     * @param libEnabled whether :lib has enabled = true in monorepoReleaseConfig
+     * @param releaseChangedProjectsScope scope used by the aggregator task (default "minor")
+     */
+    fun createMultiProject(
+        projectDir: File,
+        globalTagPrefix: String = "release",
+        libEnabled: Boolean = true,
+        releaseChangedProjectsScope: String = "minor"
+    ): ReleaseTestProject {
+        val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
+
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins {
+                id("io.github.doug-hawley.monorepo-release-plugin")
+            }
+
+            monorepoRelease {
+                globalTagPrefix = "$globalTagPrefix"
+                releaseChangedProjectsScope = "$releaseChangedProjectsScope"
+            }
+            """.trimIndent()
+        )
+
+        File(projectDir, "settings.gradle.kts").writeText(
+            """
+            rootProject.name = "test-project"
+            include(":app")
+            include(":lib")
+            """.trimIndent()
+        )
+
+        File(projectDir, ".gitignore").writeText(
+            """
+            .gradle/
+            build/
+            """.trimIndent()
+        )
+
+        val appDir = File(projectDir, "app")
+        appDir.mkdirs()
+        File(appDir, "build.gradle.kts").writeText(
+            """
+            monorepoReleaseConfig {
+                enabled = true
+            }
+
+            // Lightweight fake build task: creates the expected artifact so release can proceed
+            tasks.register("build") {
+                doLast {
+                    val libsDir = layout.buildDirectory.dir("libs").get().asFile
+                    libsDir.mkdirs()
+                    java.io.File(libsDir, "${'$'}{project.name}.jar").writeText("built artifact")
+                }
+            }
+            """.trimIndent()
+        )
+        File(appDir, "app.txt").writeText("app source")
+
+        val libDir = File(projectDir, "lib")
+        libDir.mkdirs()
+        File(libDir, "build.gradle.kts").writeText(
+            """
+            monorepoReleaseConfig {
+                enabled = $libEnabled
+            }
+
+            // Lightweight fake build task: creates the expected artifact so release can proceed
+            tasks.register("build") {
+                doLast {
+                    val libsDir = layout.buildDirectory.dir("libs").get().asFile
+                    libsDir.mkdirs()
+                    java.io.File(libsDir, "${'$'}{project.name}.jar").writeText("built artifact")
+                }
+            }
+            """.trimIndent()
+        )
+        File(libDir, "lib.txt").writeText("lib source")
+
+        return ReleaseTestProject(projectDir, remoteDir)
+    }
+
+    fun createMultiProjectAndInitialize(
+        projectDir: File,
+        globalTagPrefix: String = "release",
+        libEnabled: Boolean = true,
+        releaseChangedProjectsScope: String = "minor"
+    ): ReleaseTestProject {
+        val project = createMultiProject(projectDir, globalTagPrefix, libEnabled, releaseChangedProjectsScope)
+        project.initGit()
+        project.commitAll("Initial commit")
+        project.pushToRemote()
+        return project
+    }
 }
 
 class ReleaseTestProject(
@@ -191,9 +290,13 @@ class ReleaseTestProject(
     }
 
     fun createFakeBuiltArtifact() {
-        val libsDir = File(projectDir, "app/build/libs")
+        createFakeBuiltArtifact("app")
+    }
+
+    fun createFakeBuiltArtifact(subprojectName: String) {
+        val libsDir = File(projectDir, "$subprojectName/build/libs")
         libsDir.mkdirs()
-        File(libsDir, "app.jar").writeText("fake jar content")
+        File(libsDir, "$subprojectName.jar").writeText("fake jar content")
     }
 
     fun releaseVersionFile(): String? {

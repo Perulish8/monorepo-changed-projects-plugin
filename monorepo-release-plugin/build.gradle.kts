@@ -18,9 +18,18 @@ val embed by configurations.creating {
     isTransitive = false
 }
 
+// Peer plugins that this plugin auto-applies at runtime.
+// Added to compileClasspath (for type-safe access) and runtimeClasspath (so TestKit's
+// pluginUnderTestMetadata includes them for functional tests).
+// NOT bundled into the plugin jar and NOT published as a POM dependency.
+val peerPlugin by configurations.creating {
+    isTransitive = false
+}
+
 dependencies {
     implementation(kotlin("stdlib"))
     embed(project(":monorepo-plugin-core"))
+    peerPlugin(project(":monorepo-build-plugin"))
     testImplementation("io.kotest:kotest-runner-junit5:5.9.1")
     testImplementation("io.kotest:kotest-assertions-core:5.9.1")
     testImplementation("io.kotest:kotest-property:5.9.1")
@@ -29,12 +38,13 @@ dependencies {
 // Make embedded classes available for compilation, runtime, and all test source sets
 // (compileClasspath/runtimeClasspath are not published in the POM)
 configurations {
-    compileClasspath { extendsFrom(embed) }
-    runtimeClasspath { extendsFrom(embed) }
-    testRuntimeClasspath { extendsFrom(embed) }
+    compileClasspath { extendsFrom(embed, peerPlugin) }
+    runtimeClasspath { extendsFrom(embed, peerPlugin) }
+    testRuntimeClasspath { extendsFrom(embed, peerPlugin) }
 }
 
 // Bundle embedded jar contents directly into the plugin jar
+// peerPlugin is intentionally excluded — it is a separate published plugin
 tasks.named<Jar>("jar") {
     dependsOn(embed)
     from(embed.map { if (it.isDirectory) it else zipTree(it) })

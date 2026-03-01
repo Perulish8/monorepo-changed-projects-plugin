@@ -71,7 +71,7 @@ class MonorepoBuildPlugin @Inject constructor(
         project.gradle.projectsEvaluated {
             if (rootExtension.computationGuard.compareAndSet(false, true)) {
                 try {
-                    val mode = resolveMode(project.rootProject)
+                    val mode = resolveMode(project.rootProject, rootExtension)
                     if (mode == DetectionMode.FROM_REF) {
                         val commitRef = resolveCommitRef(project.rootProject, rootExtension)
                             ?: throw GradleException(
@@ -189,11 +189,12 @@ class MonorepoBuildPlugin @Inject constructor(
      * Determines which detection mode to use based on the tasks requested in this invocation.
      * Fails fast if both branch-mode and ref-mode tasks appear in the same invocation.
      */
-    private fun resolveMode(project: Project): DetectionMode {
+    private fun resolveMode(project: Project, extension: MonorepoBuildExtension): DetectionMode {
         val requested = project.gradle.startParameter.taskNames
             .map { it.substringAfterLast(":") }
             .toSet()
-        val wantsRef = requested.any { it in REF_TASKS }
+        val allRefTasks = REF_TASKS + extension.additionalRefModeTasks
+        val wantsRef = requested.any { it in allRefTasks }
         val wantsBranch = requested.any { it in BRANCH_TASKS }
         if (wantsRef && wantsBranch) {
             throw GradleException(
