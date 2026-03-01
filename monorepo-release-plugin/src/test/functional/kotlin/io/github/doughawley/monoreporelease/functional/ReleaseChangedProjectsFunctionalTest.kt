@@ -110,11 +110,11 @@ class ReleaseChangedProjectsFunctionalTest : FunSpec({
     // Scope override
     // ─────────────────────────────────────────────────────────────
 
-    test("releaseChangedProjectsScope=major bumps both projects to v1.0.0") {
+    test("primaryBranchScope=major bumps both projects to v1.0.0") {
         // given: both projects have a prior v0.1.0 release; scope configured to major
         val project = StandardReleaseTestProject.createMultiProjectAndInitialize(
             testListener.getTestProjectDir(),
-            releaseChangedProjectsScope = "major"
+            primaryBranchScope = "major"
         )
         project.createTag("release/app/v0.1.0")
         project.pushTag("release/app/v0.1.0")
@@ -156,7 +156,7 @@ class ReleaseChangedProjectsFunctionalTest : FunSpec({
             }
 
             monorepoRelease {
-                releaseChangedProjectsScope = "minor"
+                primaryBranchScope = "minor"
             }
             """.trimIndent()
         )

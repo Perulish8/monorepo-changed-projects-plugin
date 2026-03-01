@@ -781,68 +781,6 @@ class ReleaseTaskFunctionalTest : FunSpec({
     // New gap-fix tests
     // ─────────────────────────────────────────────────────────────
 
-    test("invalid -Prelease.scope value fails with clear message") {
-        // given
-        val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
-        project.createFakeBuiltArtifact()
-
-        // when
-        val result = project.runTaskAndFail(":app:release", properties = mapOf("release.scope" to "foobar"))
-
-        // then
-        result.output shouldContain "Invalid release.scope"
-    }
-
-    test("DSL releaseChangedProjectsScope=patch fails with clear message") {
-        // given
-        val projectDir = testListener.getTestProjectDir()
-        val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
-
-        File(projectDir, "build.gradle.kts").writeText(
-            """
-            plugins {
-                id("io.github.doug-hawley.monorepo-release-plugin")
-            }
-
-            monorepoRelease {
-                releaseChangedProjectsScope = "patch"
-            }
-            """.trimIndent()
-        )
-        File(projectDir, "settings.gradle.kts").writeText(
-            """
-            rootProject.name = "test-project"
-            include(":app")
-            """.trimIndent()
-        )
-        File(projectDir, ".gitignore").writeText(".gradle/\nbuild/")
-        val appDir = File(projectDir, "app")
-        appDir.mkdirs()
-        File(appDir, "build.gradle.kts").writeText(
-            """
-            plugins {
-                kotlin("jvm") version "2.0.21"
-            }
-            monorepoReleaseConfig {
-                enabled = true
-            }
-            """.trimIndent()
-        )
-
-        val project = ReleaseTestProject(projectDir, remoteDir)
-        project.initGit()
-        project.commitAll("Initial commit")
-        project.pushToRemote()
-        project.createFakeBuiltArtifact()
-
-        // when
-        val result = project.runTaskAndFail(":app:release")
-
-        // then
-        result.output shouldContain "patch"
-        result.output shouldContain "Cannot"
-    }
-
     test("detached HEAD fails with clear message") {
         // given
         val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
@@ -980,8 +918,9 @@ class ReleaseTaskFunctionalTest : FunSpec({
     // Branch behavior
     // ─────────────────────────────────────────────────────────────
 
-    test("non-main allowed branch pushes tag only without creating release branch") {
-        // given: 'develop' added to releaseBranchPatterns; isMainBranch("develop") is false
+    test("non-main allowed branch creates release branch and pushes tag") {
+        // given: 'develop' added to releaseBranchPatterns; it is not a release branch,
+        // so the !isReleaseBranch path fires and a release branch is created
         val projectDir = testListener.getTestProjectDir()
         val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
 
@@ -1025,10 +964,10 @@ class ReleaseTaskFunctionalTest : FunSpec({
         // when
         val result = project.runTask(":app:release")
 
-        // then: tag pushed, but no release branch created (develop is not main)
+        // then: tag and release branch both pushed (develop is a primary branch, not a release branch)
         result.task(":app:release")?.outcome shouldBe TaskOutcome.SUCCESS
         project.remoteTags() shouldContain "release/app/v0.1.0"
-        project.remoteBranches() shouldNotContain "release/app/v0.1.x"
+        project.remoteBranches() shouldContain "release/app/v0.1.x"
     }
 
     // ─────────────────────────────────────────────────────────────

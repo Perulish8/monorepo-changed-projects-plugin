@@ -103,13 +103,13 @@ object StandardReleaseTestProject {
      * Both subprojects opt in to releases by default.
      *
      * @param libEnabled whether :lib has enabled = true in monorepoReleaseConfig
-     * @param releaseChangedProjectsScope scope used by the aggregator task (default "minor")
+     * @param primaryBranchScope scope used when releasing from the primary branch (default "minor")
      */
     fun createMultiProject(
         projectDir: File,
         globalTagPrefix: String = "release",
         libEnabled: Boolean = true,
-        releaseChangedProjectsScope: String = "minor"
+        primaryBranchScope: String = "minor"
     ): ReleaseTestProject {
         val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
 
@@ -121,7 +121,7 @@ object StandardReleaseTestProject {
 
             monorepoRelease {
                 globalTagPrefix = "$globalTagPrefix"
-                releaseChangedProjectsScope = "$releaseChangedProjectsScope"
+                primaryBranchScope = "$primaryBranchScope"
             }
             """.trimIndent()
         )
@@ -188,9 +188,9 @@ object StandardReleaseTestProject {
         projectDir: File,
         globalTagPrefix: String = "release",
         libEnabled: Boolean = true,
-        releaseChangedProjectsScope: String = "minor"
+        primaryBranchScope: String = "minor"
     ): ReleaseTestProject {
-        val project = createMultiProject(projectDir, globalTagPrefix, libEnabled, releaseChangedProjectsScope)
+        val project = createMultiProject(projectDir, globalTagPrefix, libEnabled, primaryBranchScope)
         project.initGit()
         project.commitAll("Initial commit")
         project.pushToRemote()
