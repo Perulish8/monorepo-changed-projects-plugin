@@ -21,7 +21,7 @@ object StandardReleaseTestProject {
     fun create(
         projectDir: File,
         globalTagPrefix: String = "release",
-        releaseChangedProjectsScope: String = "minor"
+        primaryBranchScope: String = "minor"
     ): ReleaseTestProject {
         val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
 
@@ -34,7 +34,7 @@ object StandardReleaseTestProject {
 
             monorepoRelease {
                 globalTagPrefix = "$globalTagPrefix"
-                releaseChangedProjectsScope = "$releaseChangedProjectsScope"
+                primaryBranchScope = "$primaryBranchScope"
             }
             """.trimIndent()
         )
@@ -89,9 +89,9 @@ object StandardReleaseTestProject {
     fun createAndInitialize(
         projectDir: File,
         globalTagPrefix: String = "release",
-        releaseChangedProjectsScope: String = "minor"
+        primaryBranchScope: String = "minor"
     ): ReleaseTestProject {
-        val project = create(projectDir, globalTagPrefix, releaseChangedProjectsScope)
+        val project = create(projectDir, globalTagPrefix, primaryBranchScope)
         project.initGit()
         project.commitAll("Initial commit")
         project.pushToRemote()

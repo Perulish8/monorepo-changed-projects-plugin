@@ -122,19 +122,22 @@ class ReleaseTaskFunctionalTest : FunSpec({
         project.remoteBranches() shouldNotContain "release/app/v0.1.x.x"
     }
 
-    test("on release branch scope is always PATCH regardless of -Prelease.scope or DSL") {
-        // given
-        val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
+    test("release branch ignores DSL primaryBranchScope and always uses patch") {
+        // given: primaryBranchScope=major in DSL should have no effect on a release branch
+        val project = StandardReleaseTestProject.createAndInitialize(
+            testListener.getTestProjectDir(),
+            primaryBranchScope = "major"
+        )
         project.createTag("release/app/v0.1.0")
         project.pushTag("release/app/v0.1.0")
         project.createBranch("release/app/v0.1.x")
         project.executeGitPush("release/app/v0.1.x")
         project.createFakeBuiltArtifact()
 
-        // when: scope=minor flag is provided but should be ignored on release branch
-        val result = project.runTask(":app:release", properties = mapOf("release.scope" to "minor"))
+        // when: no scope flag provided
+        val result = project.runTask(":app:release")
 
-        // then: still produces a patch
+        // then: patch applied, not major
         result.task(":app:release")?.outcome shouldBe TaskOutcome.SUCCESS
         project.remoteTags() shouldContain "release/app/v0.1.1"
     }
@@ -416,24 +419,7 @@ class ReleaseTaskFunctionalTest : FunSpec({
         result.output shouldContain "main"
     }
 
-    test("release branch + -Prelease.scope=minor flag is ignored (patch used instead)") {
-        // given
-        val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
-        project.createTag("release/app/v0.1.0")
-        project.pushTag("release/app/v0.1.0")
-        project.createBranch("release/app/v0.1.x")
-        project.executeGitPush("release/app/v0.1.x")
-        project.createFakeBuiltArtifact()
-
-        // when: minor flag on release branch — should be ignored (PATCH forced)
-        val result = project.runTask(":app:release", properties = mapOf("release.scope" to "minor"))
-
-        // then: patch was applied despite the flag
-        result.task(":app:release")?.outcome shouldBe TaskOutcome.SUCCESS
-        project.remoteTags() shouldContain "release/app/v0.1.1"
-    }
-
-    test("release branch + -Prelease.scope=major flag is ignored (patch used instead)") {
+    test("release branch with -Prelease.scope=minor fails with clear message") {
         // given
         val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
         project.createTag("release/app/v0.1.0")
@@ -443,11 +429,28 @@ class ReleaseTaskFunctionalTest : FunSpec({
         project.createFakeBuiltArtifact()
 
         // when
-        val result = project.runTask(":app:release", properties = mapOf("release.scope" to "major"))
+        val result = project.runTaskAndFail(":app:release", properties = mapOf("release.scope" to "minor"))
 
-        // then: patch was applied despite the flag
-        result.task(":app:release")?.outcome shouldBe TaskOutcome.SUCCESS
-        project.remoteTags() shouldContain "release/app/v0.1.1"
+        // then
+        result.output shouldContain "minor"
+        result.output shouldContain "release branch"
+    }
+
+    test("release branch with -Prelease.scope=major fails with clear message") {
+        // given
+        val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
+        project.createTag("release/app/v0.1.0")
+        project.pushTag("release/app/v0.1.0")
+        project.createBranch("release/app/v0.1.x")
+        project.executeGitPush("release/app/v0.1.x")
+        project.createFakeBuiltArtifact()
+
+        // when
+        val result = project.runTaskAndFail(":app:release", properties = mapOf("release.scope" to "major"))
+
+        // then
+        result.output shouldContain "major"
+        result.output shouldContain "release branch"
     }
 
     test("release branch with no scope flag succeeds with PATCH") {
@@ -480,11 +483,11 @@ class ReleaseTaskFunctionalTest : FunSpec({
         result.output shouldContain "bogus"
     }
 
-    test("DSL releaseChangedProjectsScope = \"major\" bumps major version") {
+    test("DSL primaryBranchScope = \"major\" bumps major version") {
         // given: prior v0.1.0 exists; major scope via DSL should produce v1.0.0
         val project = StandardReleaseTestProject.createAndInitialize(
             testListener.getTestProjectDir(),
-            releaseChangedProjectsScope = "major"
+            primaryBranchScope = "major"
         )
         project.createTag("release/app/v0.1.0")
         project.pushTag("release/app/v0.1.0")
@@ -498,11 +501,11 @@ class ReleaseTaskFunctionalTest : FunSpec({
         project.remoteTags() shouldContain "release/app/v1.0.0"
     }
 
-    test("DSL releaseChangedProjectsScope = \"patch\" on main fails with clear message") {
+    test("DSL primaryBranchScope = \"patch\" on main fails with clear message") {
         // given
         val project = StandardReleaseTestProject.createAndInitialize(
             testListener.getTestProjectDir(),
-            releaseChangedProjectsScope = "patch"
+            primaryBranchScope = "patch"
         )
         project.createFakeBuiltArtifact()
 
@@ -510,7 +513,7 @@ class ReleaseTaskFunctionalTest : FunSpec({
         val result = project.runTaskAndFail(":app:release")
 
         // then
-        result.output shouldContain "releaseChangedProjectsScope"
+        result.output shouldContain "primaryBranchScope"
         result.output shouldContain "patch"
     }
 
