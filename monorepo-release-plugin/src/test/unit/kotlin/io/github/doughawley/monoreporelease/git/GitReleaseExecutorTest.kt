@@ -126,41 +126,52 @@ class GitReleaseExecutorTest : FunSpec({
         ex.message shouldContain "release/app/v1.0.x"
     }
 
-    // pushTagAndBranch
+    // pushTag
 
-    test("pushTagAndBranch pushes only the tag when branch is null") {
+    test("pushTag executes push origin with the tag") {
         // given
         every { executor.execute(rootDir, "push", "origin", "release/app/v1.0.0") } returns
             CommandResult(success = true, output = emptyList(), exitCode = 0)
 
         // when
-        releaseExecutor.pushTagAndBranch("release/app/v1.0.0", null)
+        releaseExecutor.pushTag("release/app/v1.0.0")
 
         // then
         verify { executor.execute(rootDir, "push", "origin", "release/app/v1.0.0") }
     }
 
-    test("pushTagAndBranch pushes tag and branch in a single command") {
-        // given
-        every {
-            executor.execute(rootDir, "push", "origin", "release/app/v1.0.0", "release/app/v1.0.x")
-        } returns CommandResult(success = true, output = emptyList(), exitCode = 0)
-
-        // when
-        releaseExecutor.pushTagAndBranch("release/app/v1.0.0", "release/app/v1.0.x")
-
-        // then
-        verify { executor.execute(rootDir, "push", "origin", "release/app/v1.0.0", "release/app/v1.0.x") }
-    }
-
-    test("pushTagAndBranch throws GradleException when push fails") {
+    test("pushTag throws GradleException when push fails") {
         // given
         every { executor.execute(rootDir, "push", "origin", "release/app/v1.0.0") } returns
             CommandResult(success = false, output = emptyList(), exitCode = 1, errorOutput = "remote rejected")
 
         // when / then
-        val ex = shouldThrow<GradleException> { releaseExecutor.pushTagAndBranch("release/app/v1.0.0", null) }
-        ex.message shouldContain "Failed to push to remote"
+        val ex = shouldThrow<GradleException> { releaseExecutor.pushTag("release/app/v1.0.0") }
+        ex.message shouldContain "Failed to push tag"
+    }
+
+    // pushBranch
+
+    test("pushBranch executes push origin with the branch") {
+        // given
+        every { executor.execute(rootDir, "push", "origin", "release/app/v1.0.x") } returns
+            CommandResult(success = true, output = emptyList(), exitCode = 0)
+
+        // when
+        releaseExecutor.pushBranch("release/app/v1.0.x")
+
+        // then
+        verify { executor.execute(rootDir, "push", "origin", "release/app/v1.0.x") }
+    }
+
+    test("pushBranch throws GradleException when push fails") {
+        // given
+        every { executor.execute(rootDir, "push", "origin", "release/app/v1.0.x") } returns
+            CommandResult(success = false, output = emptyList(), exitCode = 1, errorOutput = "already exists")
+
+        // when / then
+        val ex = shouldThrow<GradleException> { releaseExecutor.pushBranch("release/app/v1.0.x") }
+        ex.message shouldContain "Failed to push branch"
     }
 
     // deleteLocalTag

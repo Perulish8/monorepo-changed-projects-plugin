@@ -233,6 +233,10 @@ class ReleaseTestProject(
         executeCommand("git", "checkout", "-b", name)
     }
 
+    fun detachHead() {
+        executeCommand("git", "checkout", "--detach")
+    }
+
     fun currentBranch(): String {
         val process = ProcessBuilder("git", "rev-parse", "--abbrev-ref", "HEAD")
             .directory(projectDir)

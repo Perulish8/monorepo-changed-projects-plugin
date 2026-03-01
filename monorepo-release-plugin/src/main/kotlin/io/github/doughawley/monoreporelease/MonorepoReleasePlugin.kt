@@ -30,18 +30,16 @@ class MonorepoReleasePlugin : Plugin<Project> {
         }
 
         // Root-level aggregator task.
+        val releasedProjectPaths = mutableListOf<String>()
         val releaseChangedProjectsTask = project.tasks.register("releaseChangedProjects") {
             group = "monorepo-release"
             description = "Releases all opted-in projects that have changed since the configured commit ref"
             dependsOn(project.tasks.named("buildChangedProjectsFromRef"))
             doLast {
-                val ext = project.rootProject.extensions
-                    .getByType(MonorepoBuildExtension::class.java)
-                val changed = ext.allAffectedProjects
-                if (changed.isEmpty()) {
-                    logger.lifecycle("No projects have changed — nothing to release.")
+                if (releasedProjectPaths.isEmpty()) {
+                    logger.lifecycle("No opted-in projects changed — nothing to release.")
                 } else {
-                    logger.lifecycle("Released changed projects: ${changed.joinToString(", ")}")
+                    logger.lifecycle("Released projects: ${releasedProjectPaths.joinToString(", ")}")
                 }
             }
         }
@@ -63,6 +61,8 @@ class MonorepoReleasePlugin : Plugin<Project> {
                 }
 
                 val releaseTask = sub.tasks.findByName("release") ?: return@forEach
+
+                releasedProjectPaths.add(projectPath)
 
                 // mustRunAfter ensures release runs after build when both are in the graph,
                 // but does not force buildChangedProjectsFromRef to run for standalone :project:release.

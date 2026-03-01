@@ -777,6 +777,161 @@ class ReleaseTaskFunctionalTest : FunSpec({
         result.output shouldContain "release"
     }
 
+    // ─────────────────────────────────────────────────────────────
+    // New gap-fix tests
+    // ─────────────────────────────────────────────────────────────
+
+    test("invalid -Prelease.scope value fails with clear message") {
+        // given
+        val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
+        project.createFakeBuiltArtifact()
+
+        // when
+        val result = project.runTaskAndFail(":app:release", properties = mapOf("release.scope" to "foobar"))
+
+        // then
+        result.output shouldContain "Invalid release.scope"
+    }
+
+    test("DSL releaseChangedProjectsScope=patch fails with clear message") {
+        // given
+        val projectDir = testListener.getTestProjectDir()
+        val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
+
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins {
+                id("io.github.doug-hawley.monorepo-release-plugin")
+            }
+
+            monorepoRelease {
+                releaseChangedProjectsScope = "patch"
+            }
+            """.trimIndent()
+        )
+        File(projectDir, "settings.gradle.kts").writeText(
+            """
+            rootProject.name = "test-project"
+            include(":app")
+            """.trimIndent()
+        )
+        File(projectDir, ".gitignore").writeText(".gradle/\nbuild/")
+        val appDir = File(projectDir, "app")
+        appDir.mkdirs()
+        File(appDir, "build.gradle.kts").writeText(
+            """
+            plugins {
+                kotlin("jvm") version "2.0.21"
+            }
+            monorepoReleaseConfig {
+                enabled = true
+            }
+            """.trimIndent()
+        )
+
+        val project = ReleaseTestProject(projectDir, remoteDir)
+        project.initGit()
+        project.commitAll("Initial commit")
+        project.pushToRemote()
+        project.createFakeBuiltArtifact()
+
+        // when
+        val result = project.runTaskAndFail(":app:release")
+
+        // then
+        result.output shouldContain "patch"
+        result.output shouldContain "Cannot"
+    }
+
+    test("detached HEAD fails with clear message") {
+        // given
+        val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
+        project.detachHead()
+        project.createFakeBuiltArtifact()
+
+        // when
+        val result = project.runTaskAndFail(":app:release")
+
+        // then
+        result.output shouldContain "detached HEAD"
+    }
+
+    test("local release branch collision rolls back the local tag") {
+        // given: create release/app/v0.1.x locally but do NOT push it
+        val project = StandardReleaseTestProject.createAndInitialize(testListener.getTestProjectDir())
+        project.createBranch("release/app/v0.1.x")
+        project.checkoutBranch("main")
+        project.createFakeBuiltArtifact()
+
+        // when: release tries to create release/app/v0.1.x locally → fails → tag rolled back
+        project.runTaskAndFail(":app:release")
+
+        // then: local tag was rolled back by Bug 2 fix
+        project.localTags() shouldNotContain "release/app/v0.1.0"
+    }
+
+    test("custom non-main primary branch with configured pattern creates release branch") {
+        // given: trunk is configured as the allowed release branch
+        val projectDir = testListener.getTestProjectDir()
+        val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
+
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins {
+                id("io.github.doug-hawley.monorepo-release-plugin")
+            }
+
+            monorepoRelease {
+                releaseBranchPatterns = listOf("^trunk${'$'}")
+            }
+            """.trimIndent()
+        )
+        File(projectDir, "settings.gradle.kts").writeText(
+            """
+            rootProject.name = "test-project"
+            include(":app")
+            """.trimIndent()
+        )
+        File(projectDir, ".gitignore").writeText(".gradle/\nbuild/")
+        val appDir = File(projectDir, "app")
+        appDir.mkdirs()
+        File(appDir, "build.gradle.kts").writeText(
+            """
+            plugins {
+                kotlin("jvm") version "2.0.21"
+            }
+            monorepoReleaseConfig {
+                enabled = true
+            }
+            """.trimIndent()
+        )
+
+        remoteDir.mkdirs()
+        fun runGit(vararg cmd: String) {
+            val exitCode = ProcessBuilder(*cmd).directory(projectDir).start().waitFor()
+            if (exitCode != 0) throw RuntimeException("Command failed: ${cmd.joinToString(" ")}")
+        }
+        ProcessBuilder("git", "init", "--bare").directory(remoteDir).start().waitFor()
+        runGit("git", "init")
+        runGit("git", "config", "user.email", "test@example.com")
+        runGit("git", "config", "user.name", "Test User")
+        runGit("git", "checkout", "-b", "trunk")
+        runGit("git", "remote", "add", "origin", remoteDir.absolutePath)
+        runGit("git", "add", ".")
+        runGit("git", "commit", "-m", "Initial commit")
+        runGit("git", "push", "-u", "origin", "trunk")
+
+        val project = ReleaseTestProject(projectDir, remoteDir)
+        project.createFakeBuiltArtifact()
+
+        // when: on trunk (a non-release-branch primary branch) → should create release branch
+        val result = project.runTask(":app:release")
+
+        // then
+        result.task(":app:release")?.outcome shouldBe TaskOutcome.SUCCESS
+        project.remoteBranches() shouldContain "release/app/v0.1.x"
+    }
+
     test("subproject with enabled=false has no release task") {
         // given
         val projectDir = testListener.getTestProjectDir()
