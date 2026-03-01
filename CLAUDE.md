@@ -35,21 +35,22 @@ GitChangedFilesDetector  →  ProjectFileMapper  →  ProjectMetadataFactory  �
 (git diff/ls-files)          (file → project)       (dependency graph)         (results stored)
 ```
 
-**Key classes** (all under `monorepo-build-release-plugin/src/main/kotlin/io/github/doughawley/`):
+**Key classes** (all under `monorepo-build-release-plugin/src/main/kotlin/io/github/doughawley/monorepo/`):
 
 | Class | Role |
 |---|---|
-| `monorepo/MonorepoBuildReleasePlugin` | Plugin entry point; registers all extensions and tasks; triggers metadata computation in `projectsEvaluated` |
-| `monorepobuild/MonorepoBuildExtension` | User configuration DSL (`baseBranch`, `includeUntracked`, `excludePatterns`) and internal metadata storage |
-| `monorepobuild/task/PrintChangedProjectsTask` | Reads pre-computed metadata from extension and outputs results |
-| `monorepobuild/git/GitChangedFilesDetector` | Runs `git diff`, `git diff --cached`, and `git ls-files` to find changed files; applies exclude patterns |
-| `monorepobuild/domain/ProjectFileMapper` | Maps changed file paths to Gradle project paths |
-| `monorepobuild/domain/ProjectMetadataFactory` | Builds dependency graph by introspecting Gradle `ProjectDependency` objects |
-| `monorepobuild/domain/ProjectMetadata` | Immutable data model; `hasChanges()` traverses transitive deps |
-| `monoreporelease/MonorepoReleaseExtension` | Release configuration DSL (`globalTagPrefix`, `primaryBranchScope`, `releaseBranchPatterns`) |
-| `monoreporelease/task/ReleaseTask` | Creates versioned git tag for a subproject; triggers `postRelease` lifecycle hook |
-| `monoreporelease/git/GitTagScanner` | Finds the most recent version tag for a project prefix |
-| `monoreporelease/git/GitReleaseExecutor` | Pushes tags and release branches via git |
+| `MonorepoBuildReleasePlugin` | Plugin entry point; registers all extensions and tasks; triggers metadata computation in `projectsEvaluated` |
+| `build/MonorepoBuildExtension` | User configuration DSL (`baseBranch`, `includeUntracked`, `excludePatterns`) and internal metadata storage |
+| `build/task/PrintChangedProjectsTask` | Reads pre-computed metadata from extension and outputs results |
+| `build/git/GitChangedFilesDetector` | Runs `git diff`, `git diff --cached`, and `git ls-files` to find changed files; applies exclude patterns |
+| `build/domain/ProjectFileMapper` | Maps changed file paths to Gradle project paths |
+| `build/domain/ProjectMetadataFactory` | Builds dependency graph by introspecting Gradle `ProjectDependency` objects |
+| `build/domain/ProjectMetadata` | Immutable data model; `hasChanges()` traverses transitive deps |
+| `release/MonorepoReleaseExtension` | Release configuration DSL (`globalTagPrefix`, `primaryBranchScope`, `releaseBranchPatterns`) |
+| `release/task/ReleaseTask` | Creates versioned git tag for a subproject; triggers `postRelease` lifecycle hook |
+| `release/git/GitTagScanner` | Finds the most recent version tag for a project prefix |
+| `release/git/GitReleaseExecutor` | Pushes tags and release branches via git |
+| `git/GitCommandExecutor` | Low-level `ProcessBuilder` wrapper for executing git commands |
 
 **Root project special case**: The root project is marked as changed only when files in the root directory (not inside any subproject directory) have changed.
 
