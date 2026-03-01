@@ -52,6 +52,13 @@ open class MonorepoBuildExtension {
         internal set
 
     /**
+     * Additional task names that trigger ref-mode detection, populated by other plugins
+     * (e.g. the release plugin registers "releaseChangedProjects" here). This keeps
+     * coupling strictly one-directional: other plugins → build plugin, never the reverse.
+     */
+    var additionalRefModeTasks: Set<String> = emptySet()
+
+    /**
      * Guards against concurrent metadata computation under --parallel builds.
      * The first thread to win compareAndSet(false, true) performs the computation;
      * all others see true and skip it.
