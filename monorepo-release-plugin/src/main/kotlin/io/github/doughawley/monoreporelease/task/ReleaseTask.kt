@@ -47,6 +47,12 @@ open class ReleaseTask : DefaultTask() {
         // 3. Branch validation
         val globalPrefix = rootExtension.globalTagPrefix
         val currentBranch = gitReleaseExecutor.currentBranch()
+        if (currentBranch == "HEAD") {
+            throw GradleException(
+                "Cannot release from a detached HEAD state. " +
+                "Check out a branch before releasing."
+            )
+        }
         val isReleaseBranch = TagPattern.isReleaseBranch(currentBranch, globalPrefix)
         val isAllowedBranch = isReleaseBranch || rootExtension.releaseBranchPatterns.any { pattern ->
             currentBranch.matches(Regex(pattern))
@@ -104,10 +110,15 @@ open class ReleaseTask : DefaultTask() {
         // 10. Create tag locally
         gitReleaseExecutor.createTagLocally(tag)
 
-        // 11. Create release branch locally (only on main)
-        val releaseBranch = if (isMainBranch(currentBranch)) {
+        // 11. Create release branch locally (only when not on a release branch)
+        val releaseBranch: String? = if (!isReleaseBranch) {
             val branch = TagPattern.formatReleaseBranch(globalPrefix, projectPrefix, nextVersion)
-            gitReleaseExecutor.createBranchLocally(branch)
+            try {
+                gitReleaseExecutor.createBranchLocally(branch)
+            } catch (e: GradleException) {
+                gitReleaseExecutor.deleteLocalTag(tag)
+                throw e
+            }
             branch
         } else {
             null
@@ -115,7 +126,7 @@ open class ReleaseTask : DefaultTask() {
 
         // 12. Push to remote (with rollback on failure)
         try {
-            gitReleaseExecutor.pushTagAndBranch(tag, releaseBranch)
+            gitReleaseExecutor.pushTag(tag)
         } catch (e: GradleException) {
             logger.error("Push failed, rolling back local changes: ${e.message}")
             gitReleaseExecutor.deleteLocalTag(tag)
@@ -123,6 +134,19 @@ open class ReleaseTask : DefaultTask() {
                 gitReleaseExecutor.deleteLocalBranch(releaseBranch)
             }
             throw e
+        }
+        if (releaseBranch != null) {
+            try {
+                gitReleaseExecutor.pushBranch(releaseBranch)
+            } catch (e: GradleException) {
+                gitReleaseExecutor.deleteLocalTag(tag)
+                gitReleaseExecutor.deleteLocalBranch(releaseBranch)
+                logger.error(
+                    "Branch push failed. Tag '$tag' was already pushed to remote — " +
+                    "it cannot be rolled back automatically."
+                )
+                throw e
+            }
         }
 
         // 13. Write build/release-version.txt
@@ -182,7 +206,4 @@ open class ReleaseTask : DefaultTask() {
         return dslScope
     }
 
-    private fun isMainBranch(branch: String): Boolean {
-        return branch == "main"
-    }
 }

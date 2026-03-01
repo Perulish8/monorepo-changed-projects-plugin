@@ -4,7 +4,9 @@ import io.kotest.core.spec.style.FunSpec
 import io.kotest.matchers.collections.shouldContain
 import io.kotest.matchers.collections.shouldNotContain
 import io.kotest.matchers.shouldBe
+import io.kotest.matchers.string.shouldContain
 import org.gradle.testkit.runner.TaskOutcome
+import java.io.File
 
 class ReleaseChangedProjectsFunctionalTest : FunSpec({
 
@@ -137,6 +139,116 @@ class ReleaseChangedProjectsFunctionalTest : FunSpec({
     // ─────────────────────────────────────────────────────────────
     // Tag collision resilience (--continue)
     // ─────────────────────────────────────────────────────────────
+
+    // ─────────────────────────────────────────────────────────────
+    // Nothing to release
+    // ─────────────────────────────────────────────────────────────
+
+    test("changed projects with all disabled emits nothing-to-release log and creates no tags") {
+        // given: both :app and :lib have enabled = false
+        val projectDir = testListener.getTestProjectDir()
+        val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
+
+        File(projectDir, "build.gradle.kts").writeText(
+            """
+            plugins {
+                id("io.github.doug-hawley.monorepo-release-plugin")
+            }
+
+            monorepoRelease {
+                releaseChangedProjectsScope = "minor"
+            }
+            """.trimIndent()
+        )
+        File(projectDir, "settings.gradle.kts").writeText(
+            """
+            rootProject.name = "test-project"
+            include(":app")
+            include(":lib")
+            """.trimIndent()
+        )
+        File(projectDir, ".gitignore").writeText(".gradle/\nbuild/")
+
+        val appDir = File(projectDir, "app")
+        appDir.mkdirs()
+        File(appDir, "build.gradle.kts").writeText(
+            """
+            monorepoReleaseConfig {
+                enabled = false
+            }
+
+            tasks.register("build") {
+                doLast {
+                    val libsDir = layout.buildDirectory.dir("libs").get().asFile
+                    libsDir.mkdirs()
+                    java.io.File(libsDir, "${'$'}{project.name}.jar").writeText("built artifact")
+                }
+            }
+            """.trimIndent()
+        )
+        File(appDir, "app.txt").writeText("app source")
+
+        val libDir = File(projectDir, "lib")
+        libDir.mkdirs()
+        File(libDir, "build.gradle.kts").writeText(
+            """
+            monorepoReleaseConfig {
+                enabled = false
+            }
+
+            tasks.register("build") {
+                doLast {
+                    val libsDir = layout.buildDirectory.dir("libs").get().asFile
+                    libsDir.mkdirs()
+                    java.io.File(libsDir, "${'$'}{project.name}.jar").writeText("built artifact")
+                }
+            }
+            """.trimIndent()
+        )
+        File(libDir, "lib.txt").writeText("lib source")
+
+        val project = ReleaseTestProject(projectDir, remoteDir)
+        project.initGit()
+        project.commitAll("Initial commit")
+        project.pushToRemote()
+        project.modifyFile("app/app.txt", "changed")
+        project.modifyFile("lib/lib.txt", "changed")
+        project.commitAll("Change both")
+
+        // when
+        val result = project.runTask(
+            "releaseChangedProjects",
+            properties = mapOf("monorepoBuild.commitRef" to "HEAD~1")
+        )
+
+        // then
+        result.task(":releaseChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
+        project.remoteTags() shouldBe emptyList()
+        result.output shouldContain "nothing to release"
+    }
+
+    // ─────────────────────────────────────────────────────────────
+    // postRelease lifecycle
+    // ─────────────────────────────────────────────────────────────
+
+    test("postRelease runs for all released projects") {
+        // given: both :app and :lib changed
+        val project = StandardReleaseTestProject.createMultiProjectAndInitialize(testListener.getTestProjectDir())
+        project.modifyFile("app/app.txt", "changed")
+        project.modifyFile("lib/lib.txt", "changed")
+        project.commitAll("Change both")
+
+        // when
+        val result = project.runTask(
+            "releaseChangedProjects",
+            properties = mapOf("monorepoBuild.commitRef" to "HEAD~1")
+        )
+
+        // then: both postRelease tasks ran (UP_TO_DATE = no-op task ran, not SKIPPED due to failure)
+        result.task(":releaseChangedProjects")?.outcome shouldBe TaskOutcome.SUCCESS
+        result.task(":app:postRelease")?.outcome shouldBe TaskOutcome.UP_TO_DATE
+        result.task(":lib:postRelease")?.outcome shouldBe TaskOutcome.UP_TO_DATE
+    }
 
     test("tag collision on one project does not prevent the other from releasing") {
         // given: both projects changed; a pre-existing local tag for app causes its release to fail

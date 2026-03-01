@@ -43,16 +43,20 @@ class GitReleaseExecutor(
         logger.lifecycle("Created local branch: $branch")
     }
 
-    fun pushTagAndBranch(tag: String, branch: String?) {
-        val args = mutableListOf("push", "origin", tag)
-        if (branch != null) {
-            args.add(branch)
-        }
-        val result = executor.execute(rootDir, *args.toTypedArray())
+    fun pushTag(tag: String) {
+        val result = executor.execute(rootDir, "push", "origin", tag)
         if (!result.success) {
-            throw GradleException("Failed to push to remote: ${result.errorOutput}")
+            throw GradleException("Failed to push tag '$tag' to remote: ${result.errorOutput}")
         }
-        logger.lifecycle("Pushed tag '$tag' to remote${if (branch != null) " and branch '$branch'" else ""}")
+        logger.lifecycle("Pushed tag '$tag' to remote")
+    }
+
+    fun pushBranch(branch: String) {
+        val result = executor.execute(rootDir, "push", "origin", branch)
+        if (!result.success) {
+            throw GradleException("Failed to push branch '$branch' to remote: ${result.errorOutput}")
+        }
+        logger.lifecycle("Pushed branch '$branch' to remote")
     }
 
     fun deleteLocalTag(tag: String) {
