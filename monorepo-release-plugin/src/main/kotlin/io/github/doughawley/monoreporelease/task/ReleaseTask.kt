@@ -134,6 +134,20 @@ open class ReleaseTask : DefaultTask() {
 
     private fun resolveScope(isReleaseBranch: Boolean): Scope {
         if (isReleaseBranch) {
+            val scopeProperty = project.findProperty("release.scope") as? String
+            if (scopeProperty != null) {
+                val parsed = Scope.fromString(scopeProperty)
+                    ?: throw GradleException(
+                        "Invalid release.scope value: '$scopeProperty'. " +
+                        "Must be one of: major, minor, patch"
+                    )
+                if (parsed != Scope.PATCH) {
+                    throw GradleException(
+                        "Cannot use scope '$scopeProperty' on a release branch. " +
+                        "Patch releases only — remove the -Prelease.scope flag or use 'patch'."
+                    )
+                }
+            }
             return Scope.PATCH
         }
 
@@ -153,15 +167,15 @@ open class ReleaseTask : DefaultTask() {
             return parsed
         }
 
-        val dslScope = Scope.fromString(rootExtension.releaseChangedProjectsScope)
+        val dslScope = Scope.fromString(rootExtension.primaryBranchScope)
             ?: throw GradleException(
-                "Invalid releaseChangedProjectsScope in monorepoRelease DSL: " +
-                "'${rootExtension.releaseChangedProjectsScope}'. " +
+                "Invalid primaryBranchScope in monorepoRelease DSL: " +
+                "'${rootExtension.primaryBranchScope}'. " +
                 "Must be one of: major, minor"
             )
         if (dslScope == Scope.PATCH) {
             throw GradleException(
-                "Cannot configure releaseChangedProjectsScope as 'patch' on the main branch. " +
+                "Cannot configure primaryBranchScope as 'patch' on the main branch. " +
                 "Use 'minor' or 'major'."
             )
         }
