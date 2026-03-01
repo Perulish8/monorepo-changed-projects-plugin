@@ -18,7 +18,11 @@ import java.io.File
  */
 object StandardReleaseTestProject {
 
-    fun create(projectDir: File, globalTagPrefix: String = "release"): ReleaseTestProject {
+    fun create(
+        projectDir: File,
+        globalTagPrefix: String = "release",
+        releaseChangedProjectsScope: String = "minor"
+    ): ReleaseTestProject {
         val remoteDir = File(projectDir.parentFile, "${projectDir.name}-remote.git")
 
         // Create root build.gradle.kts
@@ -30,6 +34,7 @@ object StandardReleaseTestProject {
 
             monorepoRelease {
                 globalTagPrefix = "$globalTagPrefix"
+                releaseChangedProjectsScope = "$releaseChangedProjectsScope"
             }
             """.trimIndent()
         )
@@ -81,8 +86,12 @@ object StandardReleaseTestProject {
         return ReleaseTestProject(projectDir, remoteDir)
     }
 
-    fun createAndInitialize(projectDir: File, globalTagPrefix: String = "release"): ReleaseTestProject {
-        val project = create(projectDir, globalTagPrefix)
+    fun createAndInitialize(
+        projectDir: File,
+        globalTagPrefix: String = "release",
+        releaseChangedProjectsScope: String = "minor"
+    ): ReleaseTestProject {
+        val project = create(projectDir, globalTagPrefix, releaseChangedProjectsScope)
         project.initGit()
         project.commitAll("Initial commit")
         project.pushToRemote()

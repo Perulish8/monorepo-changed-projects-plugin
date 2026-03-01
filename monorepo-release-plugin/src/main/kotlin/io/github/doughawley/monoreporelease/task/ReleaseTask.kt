@@ -169,6 +169,6 @@ open class ReleaseTask : DefaultTask() {
     }
 
     private fun isMainBranch(branch: String): Boolean {
-        return branch == "main" || branch == "master"
+        return branch == "main"
     }
 }
