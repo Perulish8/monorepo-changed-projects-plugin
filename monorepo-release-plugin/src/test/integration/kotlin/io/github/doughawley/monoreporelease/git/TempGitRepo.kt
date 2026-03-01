@@ -26,6 +26,8 @@ class TempGitRepo {
         runGit(localDir, "push", "-u", "origin", "HEAD")
     }
 
+    // --- Tag helpers ---
+
     fun pushTag(tag: String) {
         runGit(localDir, "tag", tag)
         runGit(localDir, "push", "origin", tag)
@@ -39,9 +41,60 @@ class TempGitRepo {
         runGit(localDir, "tag", "-d", tag)
     }
 
+    fun localTagExists(tag: String): Boolean {
+        val output = runGitForOutput(localDir, "tag", "-l", tag)
+        return output.isNotEmpty()
+    }
+
+    fun remoteTagExists(tag: String): Boolean {
+        val refPattern = "refs/tags/$tag"
+        val output = runGitForOutput(localDir, "ls-remote", "--tags", "origin", refPattern)
+        return output.isNotEmpty()
+    }
+
+    // --- Branch helpers ---
+
+    fun checkoutNewBranch(branch: String) {
+        runGit(localDir, "checkout", "-b", branch)
+    }
+
+    fun localBranchExists(branch: String): Boolean {
+        val output = runGitForOutput(localDir, "branch", "-l", branch)
+        return output.isNotEmpty()
+    }
+
+    fun remoteBranchExists(branch: String): Boolean {
+        val refPattern = "refs/heads/$branch"
+        val output = runGitForOutput(localDir, "ls-remote", "--heads", "origin", refPattern)
+        return output.isNotEmpty()
+    }
+
+    // --- Working tree helpers ---
+
+    fun createUntrackedFile(name: String) {
+        File(localDir, name).writeText("untracked content")
+    }
+
+    fun modifyTrackedFile(name: String, content: String) {
+        File(localDir, name).writeText(content)
+    }
+
+    fun stageFile(name: String) {
+        runGit(localDir, "add", name)
+    }
+
+    fun commitAll(message: String) {
+        runGit(localDir, "add", ".")
+        runGit(localDir, "commit", "-m", message)
+    }
+
+    // --- Cleanup ---
+
     fun deleteRecursively() {
         tempDir.deleteRecursively()
     }
+
+    // --- Internal ---
 
     private fun runGit(dir: File, vararg args: String) {
         val cmd = listOf("git") + args.toList()
@@ -56,6 +109,17 @@ class TempGitRepo {
                 "Git command failed (exit $exitCode): ${cmd.joinToString(" ")}\n$output"
             )
         }
+    }
+
+    private fun runGitForOutput(dir: File, vararg args: String): String {
+        val cmd = listOf("git") + args.toList()
+        val process = ProcessBuilder(cmd)
+            .directory(dir)
+            .redirectErrorStream(true)
+            .start()
+        val output = process.inputStream.bufferedReader().readText()
+        process.waitFor()
+        return output.trim()
     }
 }
 
