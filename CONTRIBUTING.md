@@ -32,23 +32,18 @@ cd monorepo-gradle-plugins
 
 ```
 monorepo-gradle-plugins/
-├── monorepo-build-plugin/
+├── monorepo-build-release-plugin/
 │   ├── src/
-│   │   ├── main/kotlin/io/github/doughawley/monorepobuild/
-│   │   │   ├── MonorepoBuildPlugin.kt
-│   │   │   ├── MonorepoBuildExtension.kt
-│   │   │   ├── PrintChangedProjectsTask.kt
-│   │   │   ├── GitChangedFilesDetector.kt
-│   │   │   ├── ProjectFileMapper.kt
-│   │   │   ├── domain/
-│   │   │   │   ├── ChangedProjects.kt
-│   │   │   │   └── ProjectMetadata.kt
-│   │   │   └── git/
-│   │   │       └── GitCommandExecutor.kt
+│   │   ├── main/kotlin/io/github/doughawley/
+│   │   │   ├── monorepo/MonorepoBuildReleasePlugin.kt   # plugin entry point
+│   │   │   ├── monorepobuild/                           # change detection
+│   │   │   └── monoreporelease/                         # versioned tagging
 │   │   └── test/
 │   │       ├── unit/kotlin/           # Unit tests
-│   │       └── functional/kotlin/     # Functional tests with Gradle TestKit
+│   │       ├── integration/kotlin/    # Integration tests (real git, no TestKit)
+│   │       └── functional/kotlin/    # Functional tests with Gradle TestKit
 │   └── build.gradle.kts
+├── monorepo-plugin-core/              # Shared git utilities
 ├── build.gradle.kts
 ├── settings.gradle.kts
 └── gradle.properties
@@ -71,13 +66,13 @@ The plugin consists of several key components:
 Build the plugin and run all tests:
 
 ```bash
-./gradlew :monorepo-build-plugin:build
+./gradlew :monorepo-build-release-plugin:build
 ```
 
 ### Quick Build (Skip Tests)
 
 ```bash
-./gradlew :monorepo-build-plugin:build -x test
+./gradlew :monorepo-build-release-plugin:build -x test
 ```
 
 ### Assemble Only
@@ -85,10 +80,10 @@ Build the plugin and run all tests:
 Create the JAR without running tests:
 
 ```bash
-./gradlew :monorepo-build-plugin:assemble
+./gradlew :monorepo-build-release-plugin:assemble
 ```
 
-The built plugin JAR will be in `monorepo-build-plugin/build/libs/monorepo-build-plugin-1.1.0.jar`.
+The built plugin JAR will be in `monorepo-build-release-plugin/build/libs/`.
 
 ## Running Tests
 
@@ -97,31 +92,32 @@ This project uses [Kotest](https://kotest.io/) for testing with separate unit an
 ### Run All Tests
 
 ```bash
-./gradlew :monorepo-build-plugin:check
+./gradlew :monorepo-build-release-plugin:check
 ```
 
 ### Run Unit Tests Only
 
 ```bash
-./gradlew :monorepo-build-plugin:unitTest
+./gradlew :monorepo-build-release-plugin:unitTest
 ```
 
 ### Run Functional Tests Only
 
 ```bash
-./gradlew :monorepo-build-plugin:functionalTest
+./gradlew :monorepo-build-release-plugin:functionalTest
 ```
 
 ### Run Tests with Logging
 
 ```bash
-./gradlew :monorepo-build-plugin:unitTest --info
+./gradlew :monorepo-build-release-plugin:unitTest --info
 ```
 
 ### Test Structure
 
-- **Unit Tests** (`monorepo-build-plugin/src/test/unit/kotlin/`) - Fast, isolated tests for individual components
-- **Functional Tests** (`monorepo-build-plugin/src/test/functional/kotlin/`) - End-to-end tests using Gradle TestKit
+- **Unit Tests** (`monorepo-build-release-plugin/src/test/unit/kotlin/`) - Fast, isolated tests for individual components
+- **Integration Tests** (`monorepo-build-release-plugin/src/test/integration/kotlin/`) - Tests against a real git backend without Gradle TestKit
+- **Functional Tests** (`monorepo-build-release-plugin/src/test/functional/kotlin/`) - End-to-end tests using Gradle TestKit
 
 For more information on testing, see:
 - [TEST_STRUCTURE.md](TEST_STRUCTURE.md)
@@ -226,12 +222,12 @@ For more details, see [RELEASE_PLEASE_GUIDE.md](RELEASE_PLEASE_GUIDE.md).
 
 1. **Run tests**: Ensure all tests pass
    ```bash
-   ./gradlew :monorepo-build-plugin:check
+   ./gradlew :monorepo-build-release-plugin:check
    ```
 
 2. **Validate plugin**: Check plugin configuration
    ```bash
-   ./gradlew :monorepo-build-plugin:validatePlugins
+   ./gradlew :monorepo-build-release-plugin:validatePlugins
    ```
 
 3. **Check code style**: Ensure code follows conventions
@@ -310,7 +306,7 @@ This triggers the release workflow.
 Publish to Maven Local for testing:
 
 ```bash
-./gradlew :monorepo-build-plugin:publishToMavenLocal
+./gradlew :monorepo-build-release-plugin:publishToMavenLocal
 ```
 
 Then in a test project:
@@ -320,7 +316,7 @@ repositories {
 }
 
 plugins {
-    id("io.github.doug-hawley.monorepo-build-plugin") version "1.1.0"
+    id("io.github.doug-hawley.monorepo-build-release-plugin") version "1.1.0"
 }
 ```
 
