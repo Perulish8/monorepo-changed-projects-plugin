@@ -7,7 +7,7 @@ Your plugin is now configured and ready to publish! Here's what's already in pla
 ### Build Configuration ✅
 - [x] Plugin Publish plugin added (`com.gradle.plugin-publish` v1.3.0)
 - [x] Plugin metadata configured (website, vcsUrl, tags)
-- [x] Plugin ID: `io.github.doug-hawley.monorepo-changed-projects-plugin`
+- [x] Plugin ID: `io.github.doug-hawley.monorepo-build-release-plugin`
 - [x] Group: `io.github.doug-hawley`
 - [x] Version: `1.0.0` (in build.gradle.kts)
 
@@ -36,7 +36,7 @@ Your plugin is now configured and ready to publish! Here's what's already in pla
 
 ### Step 2: Add GitHub Secrets
 
-1. Go to your GitHub repository: https://github.com/doug-hawley/monorepo-changed-projects-plugin
+1. Go to your GitHub repository: https://github.com/doug-hawley/monorepo-gradle-plugins
 2. Navigate to: **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret**
 4. Add two secrets:
@@ -168,7 +168,7 @@ Before your first release, verify:
 ## 📦 After Publishing
 
 ### Verify Publication
-1. Check https://plugins.gradle.org/plugin/io.github.doug-hawley.monorepo-changed-projects-plugin
+1. Check https://plugins.gradle.org/plugin/io.github.doug-hawley.monorepo-build-release-plugin
 2. Verify version, description, and metadata
 3. Check that the "Read More" link points to your GitHub repo
 
@@ -185,24 +185,24 @@ pluginManagement {
 
 // build.gradle.kts
 plugins {
-    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-build-release-plugin") version "0.3.2"
 }
 
-projectsChanged {
+monorepoBuild {
     baseBranch = "main"
     includeUntracked = true
 }
 ```
 
 ```bash
-./gradlew detectChangedProjects
+./gradlew printChangedProjectsFromBranch
 ```
 
 ### Update Badges (Optional)
 Add to README.md:
 
 ```markdown
-[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/io.github.doug-hawley.monorepo-changed-projects-plugin?logo=gradle)](https://plugins.gradle.org/plugin/io.github.doug-hawley.monorepo-changed-projects-plugin)
+[![Gradle Plugin Portal](https://img.shields.io/gradle-plugin-portal/v/io.github.doug-hawley.monorepo-build-release-plugin?logo=gradle)](https://plugins.gradle.org/plugin/io.github.doug-hawley.monorepo-build-release-plugin)
 ```
 
 ### Announce Your Plugin

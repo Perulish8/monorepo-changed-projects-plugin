@@ -2,7 +2,7 @@
 
 ## ✅ Plugin ID Updated
 
-Your plugin ID has been changed to: **`io.github.doug-hawley.monorepo-changed-projects-plugin`**
+Your plugin ID has been changed to: **`io.github.doug-hawley.monorepo-build-release-plugin`**
 
 This uses your GitHub username (`doug-hawley`) and follows the recommended `io.github.username` format.
 
@@ -15,7 +15,7 @@ This uses your GitHub username (`doug-hawley`) and follows the recommended `io.g
 The Gradle Plugin Portal requires public repositories.
 
 **Steps:**
-1. Go to: https://github.com/doug-hawley/monorepo-changed-projects-plugin/settings
+1. Go to: https://github.com/doug-hawley/monorepo-gradle-plugins/settings
 2. Scroll down to **"Danger Zone"** at the bottom
 3. Click **"Change visibility"**
 4. Select **"Make public"**
@@ -45,7 +45,7 @@ This proves you own the GitHub username `doug-hawley`.
 Before resubmitting, verify:
 
 ### Repository
-- [ ] Repository is **public** (https://github.com/doug-hawley/monorepo-changed-projects-plugin)
+- [ ] Repository is **public** (https://github.com/doug-hawley/monorepo-gradle-plugins)
 - [ ] Repository has a README with usage instructions
 - [ ] Repository has a LICENSE file
 - [ ] VCS URL in build.gradle.kts is correct
@@ -55,7 +55,7 @@ Before resubmitting, verify:
 - [ ] You can see the linked GitHub username in your profile
 
 ### Build Configuration
-- [x] Plugin ID updated to `io.github.doug-hawley.monorepo-changed-projects-plugin`
+- [x] Plugin ID updated to `io.github.doug-hawley.monorepo-build-release-plugin`
 - [x] VCS URL points to public repository
 - [x] Website URL is correct
 - [x] Plugin has proper display name and description
@@ -136,7 +136,7 @@ Issue: Repository not public
 
 ### After (Ready to Approve)
 ```
-Plugin ID: io.github.doug-hawley.monorepo-changed-projects-plugin
+Plugin ID: io.github.doug-hawley.monorepo-build-release-plugin
 Verification: GitHub account linking (automatic)
 Repository: Public (once you change visibility)
 ```
@@ -158,7 +158,7 @@ grep -r "io.github.doug-hawley" build.gradle.kts
 ./gradlew clean build
 
 # Check generated plugin descriptor
-cat build/pluginDescriptors/io.github.doug-hawley.monorepo-changed-projects-plugin.properties
+cat monorepo-build-release-plugin/build/pluginDescriptors/io.github.doug-hawley.monorepo-build-release-plugin.properties
 ```
 
 ---
@@ -183,9 +183,9 @@ cat build/pluginDescriptors/io.github.doug-hawley.monorepo-changed-projects-plug
 
 ### Keep the Code Package Names
 Even though the plugin ID changed to `io.github.doug-hawley.*`, you can keep:
-- Package: `io.github.doughawley.monorepochangedprojects`
+- Package: `io.github.doughawley.monorepo`
 - Group: `io.github.doug-hawley`
-- Implementation class: `io.github.doughawley.monorepochangedprojects.MonorepoChangedProjectsPlugin`
+- Implementation class: `io.github.doughawley.monorepo.MonorepoBuildReleasePlugin`
 
 **Only the plugin ID needs to match your GitHub username.**
 
@@ -194,12 +194,12 @@ Once approved, users will install your plugin with:
 
 ```kotlin
 plugins {
-    id("io.github.doug-hawley.monorepo-changed-projects-plugin") version "1.0.0"
+    id("io.github.doug-hawley.monorepo-build-release-plugin") version "0.3.2"
 }
 ```
 
 The plugin will be available at:
-https://plugins.gradle.org/plugin/io.github.doug-hawley.monorepo-changed-projects-plugin
+https://plugins.gradle.org/plugin/io.github.doug-hawley.monorepo-build-release-plugin
 
 ---
 

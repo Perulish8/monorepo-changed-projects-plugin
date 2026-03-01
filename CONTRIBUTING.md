@@ -43,7 +43,6 @@ monorepo-gradle-plugins/
 │   │       ├── integration/kotlin/    # Integration tests (real git, no TestKit)
 │   │       └── functional/kotlin/    # Functional tests with Gradle TestKit
 │   └── build.gradle.kts
-├── monorepo-plugin-core/              # Shared git utilities
 ├── build.gradle.kts
 ├── settings.gradle.kts
 └── gradle.properties
