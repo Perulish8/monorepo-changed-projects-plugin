@@ -11,7 +11,7 @@
       "extra-files": [
         {
           "type": "generic",
-          "path": "monorepo-build-plugin/build.gradle.kts",
+          "path": "monorepo-build-release-plugin/build.gradle.kts",
           "glob": false
         },
         {
