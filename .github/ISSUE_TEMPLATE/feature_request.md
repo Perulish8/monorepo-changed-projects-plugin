@@ -23,7 +23,7 @@ assignees: ''
 
 ```kotlin
 // Example usage
-projectsChanged {
+monorepoBuild {
     // Your proposed API
 }
 ```

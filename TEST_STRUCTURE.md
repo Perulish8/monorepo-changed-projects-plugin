@@ -5,17 +5,22 @@ This project uses separate source sets for different types of tests.
 ## Directory Structure
 
 ```
-src/test/
+monorepo-build-release-plugin/src/test/
 ├── unit/
 │   └── kotlin/
-│       └── io/github/doughawley/monorepochangedprojects/
-│           ├── domain/
-│           ├── git/
-│           └── ... (unit test files)
+│       └── io/github/doughawley/
+│           ├── monorepobuild/       # Build plugin unit tests
+│           ├── monoreporelease/     # Release plugin unit tests
+│           └── monorepocore/       # GitCommandExecutor tests
+├── integration/
+│   └── kotlin/
+│       └── io/github/doughawley/monoreporelease/
+│           └── ... (integration tests against a real git backend)
 └── functional/
     └── kotlin/
-        └── io/github/doughawley/monorepochangedprojects/
-            └── ... (functional test files)
+        └── io/github/doughawley/
+            ├── monorepobuild/       # Build plugin functional tests
+            └── monoreporelease/     # Release plugin functional tests
 ```
 
 ## Test Types
@@ -27,6 +32,12 @@ Unit tests focus on testing individual components in isolation:
 - Fast execution
 - No external dependencies
 
+### Integration Tests (`src/test/integration/`)
+Integration tests verify components against a real git backend without Gradle TestKit:
+- Real git repository operations
+- No mocking of git commands
+- Faster than functional tests
+
 ### Functional Tests (`src/test/functional/`)
 Functional tests verify end-to-end functionality:
 - Plugin integration tests
@@ -35,21 +46,13 @@ Functional tests verify end-to-end functionality:
 - Tests real-world scenarios with actual git operations
 
 **Current Functional Tests:**
-- `MonorepoPluginFunctionalTest.kt` - Tests the `detectChangedProjects` task
-  - Single library change affecting dependents
-  - Service change (not affecting dependencies)
-  - Leaf project change
-  - No changes scenario
-  - Multiple independent changes
-  - Untracked files detection
-  - Staged changes detection
-  - Build file changes
-- `BuildChangedProjectsFunctionalTest.kt` - Tests the `buildChangedProjects` task
-  - Building only affected projects
-  - No changes scenario
-  - Multiple independent changes
-  - Task dependencies
-  - Leaf project builds
+- `MonorepoPluginFunctionalTest.kt` - Tests the `printChangedProjectsFromBranch` task
+- `BuildChangedProjectsFunctionalTest.kt` - Tests the `buildChangedProjectsFromBranch` task
+- `MonorepoPluginConfigurationTest.kt` - Configuration and exclude pattern scenarios
+- `PrintChangedProjectsFromRefFunctionalTest.kt` - Tests the ref-mode task
+- `WriteChangedProjectsFromRefFunctionalTest.kt` - Tests the write task
+- `ReleaseChangedProjectsFunctionalTest.kt` - Tests the `releaseChangedProjects` task
+- `ReleaseTaskFunctionalTest.kt` - Release task edge cases
 
 **Test Utilities:**
 - `TestProjectBuilder.kt` - Helper for creating test Gradle projects
@@ -64,35 +67,46 @@ Functional tests verify end-to-end functionality:
 
 ### Run All Tests
 ```bash
-./gradlew check
+./gradlew :monorepo-build-release-plugin:check
 ```
-This runs both unit and functional tests.
+This runs unit, integration, and functional tests in order.
 
 ### Run Only Unit Tests
 ```bash
-./gradlew unitTest
+./gradlew :monorepo-build-release-plugin:unitTest
+```
+
+### Run Only Integration Tests
+```bash
+./gradlew :monorepo-build-release-plugin:integrationTest
 ```
 
 ### Run Only Functional Tests
 ```bash
-./gradlew functionalTest
+./gradlew :monorepo-build-release-plugin:functionalTest
 ```
 
 ### Run Tests in Specific Order
-Functional tests automatically run after unit tests when using `check`.
+Integration tests run after unit tests; functional tests run last when using `check`.
 
 ## Adding New Tests
 
 ### Adding a Unit Test
-Create your test file in:
+Create your test file under the appropriate package in:
 ```
-src/test/unit/kotlin/io/github/doughawley/monorepochangedprojects/YourTest.kt
+monorepo-build-release-plugin/src/test/unit/kotlin/io/github/doughawley/
+```
+
+### Adding an Integration Test
+Create your test file under the appropriate package in:
+```
+monorepo-build-release-plugin/src/test/integration/kotlin/io/github/doughawley/
 ```
 
 ### Adding a Functional Test
-Create your test file in:
+Create your test file under the appropriate package in:
 ```
-src/test/functional/kotlin/io/github/doughawley/monorepochangedprojects/YourFunctionalTest.kt
+monorepo-build-release-plugin/src/test/functional/kotlin/io/github/doughawley/
 ```
 
 ## Test Configuration

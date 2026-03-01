@@ -114,13 +114,16 @@ class MyFeatureTest : FunSpec({
 ## Project Structure
 
 ```
-src/
-├── main/kotlin/io/github/doughawley/monorepochangedprojects/
-│   ├── MonorepoChangedProjectsPlugin.kt    # Main plugin entry point
-│   ├── DetectChangedProjectsTask.kt        # Core task implementation
-│   └── ProjectsChangedExtension.kt         # Configuration DSL
-└── test/kotlin/io/github/doughawley/monorepochangedprojects/
-    └── MonorepoChangedProjectsPluginTest.kt    # Kotest-based tests
+monorepo-build-release-plugin/src/
+├── main/kotlin/io/github/doughawley/
+│   ├── monorepo/
+│   │   └── MonorepoBuildReleasePlugin.kt   # Plugin entry point
+│   ├── monorepobuild/                       # Change detection components
+│   └── monoreporelease/                     # Release and versioning components
+└── test/
+    ├── unit/kotlin/                         # Unit tests (Kotest, no external dependencies)
+    ├── integration/kotlin/                  # Integration tests (real git, no TestKit)
+    └── functional/kotlin/                   # Functional tests (Gradle TestKit)
 ```
 
 ## Key Design Decisions
@@ -174,17 +177,17 @@ if (exitCode == 0) {
 
 ### Running Tests
 ```bash
-./gradlew test
+./gradlew :monorepo-build-release-plugin:check
 ```
 
 ### Building the Plugin
 ```bash
-./gradlew build
+./gradlew :monorepo-build-release-plugin:build
 ```
 
 ### Publishing Locally
 ```bash
-./gradlew publishToMavenLocal
+./gradlew :monorepo-build-release-plugin:publishToMavenLocal
 ```
 
 ## CI/CD
@@ -215,7 +218,7 @@ GitHub Actions workflows are configured in `.github/workflows/`:
 ## When Adding New Features
 
 1. **Write tests first** using Kotest FunSpec style
-2. **Add configuration options** to `ProjectsChangedExtension` if needed
+2. **Add configuration options** to `MonorepoBuildExtension` or `MonorepoReleaseExtension` if needed
 3. **Update documentation** in README.md
 4. **Add entries** to CHANGELOG.md
 5. **Consider backward compatibility** when changing public APIs
@@ -224,7 +227,7 @@ GitHub Actions workflows are configured in `.github/workflows/`:
 ## Code Review Checklist
 
 Before submitting changes, verify:
-- [ ] All tests pass (`./gradlew test`)
+- [ ] All tests pass (`./gradlew :monorepo-build-release-plugin:check`)
 - [ ] Code compiles without warnings
 - [ ] New features have Kotest tests
 - [ ] Public APIs have KDoc comments
@@ -283,8 +286,8 @@ When functional tests fail, **always check the test results files** for detailed
 **Details:** `build/test-results/functionalTest/TEST-*.xml` - Contains full error messages and stack traces
 
 Key files:
-- `TEST-io.github.doughawley.monorepochangedprojects.functional.MonorepoPluginFunctionalTest.xml` - Core plugin tests
-- `TEST-io.github.doughawley.monorepochangedprojects.functional.BuildChangedProjectsFunctionalTest.xml` - Build task tests
+- `TEST-io.github.doughawley.monorepobuild.functional.MonorepoPluginFunctionalTest.xml` - Core plugin tests
+- `TEST-io.github.doughawley.monorepobuild.functional.BuildChangedProjectsFunctionalTest.xml` - Build task tests
 
 When debugging:
 1. **First check HTML report** for overall pass/fail status

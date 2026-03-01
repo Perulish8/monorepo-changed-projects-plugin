@@ -31,7 +31,7 @@ assignees: ''
 
 ```kotlin
 // Your plugin configuration
-projectsChanged {
+monorepoBuild {
     baseBranch = "main"
     // ...
 }
