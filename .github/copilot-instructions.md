@@ -115,15 +115,15 @@ class MyFeatureTest : FunSpec({
 
 ```
 monorepo-build-release-plugin/src/
-├── main/kotlin/io/github/doughawley/
-│   ├── monorepo/
-│   │   └── MonorepoBuildReleasePlugin.kt   # Plugin entry point
-│   ├── monorepobuild/                       # Change detection components
-│   └── monoreporelease/                     # Release and versioning components
+├── main/kotlin/io/github/doughawley/monorepo/
+│   ├── MonorepoBuildReleasePlugin.kt   # Plugin entry point
+│   ├── build/                           # Change detection components
+│   ├── release/                         # Release and versioning components
+│   └── git/                             # Shared git utilities (GitCommandExecutor)
 └── test/
-    ├── unit/kotlin/                         # Unit tests (Kotest, no external dependencies)
-    ├── integration/kotlin/                  # Integration tests (real git, no TestKit)
-    └── functional/kotlin/                   # Functional tests (Gradle TestKit)
+    ├── unit/kotlin/                     # Unit tests (Kotest, no external dependencies)
+    ├── integration/kotlin/              # Integration tests (real git, no TestKit)
+    └── functional/kotlin/               # Functional tests (Gradle TestKit)
 ```
 
 ## Key Design Decisions
@@ -286,8 +286,8 @@ When functional tests fail, **always check the test results files** for detailed
 **Details:** `build/test-results/functionalTest/TEST-*.xml` - Contains full error messages and stack traces
 
 Key files:
-- `TEST-io.github.doughawley.monorepobuild.functional.MonorepoPluginFunctionalTest.xml` - Core plugin tests
-- `TEST-io.github.doughawley.monorepobuild.functional.BuildChangedProjectsFunctionalTest.xml` - Build task tests
+- `TEST-io.github.doughawley.monorepo.build.functional.MonorepoPluginDetectionFunctionalTest.xml` - Core plugin tests
+- `TEST-io.github.doughawley.monorepo.build.functional.BuildChangedProjectsFunctionalTest.xml` - Build task tests
 
 When debugging:
 1. **First check HTML report** for overall pass/fail status

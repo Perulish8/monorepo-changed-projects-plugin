@@ -34,10 +34,11 @@ cd monorepo-gradle-plugins
 monorepo-gradle-plugins/
 ├── monorepo-build-release-plugin/
 │   ├── src/
-│   │   ├── main/kotlin/io/github/doughawley/
-│   │   │   ├── monorepo/MonorepoBuildReleasePlugin.kt   # plugin entry point
-│   │   │   ├── monorepobuild/                           # change detection
-│   │   │   └── monoreporelease/                         # versioned tagging
+│   │   ├── main/kotlin/io/github/doughawley/monorepo/
+│   │   │   ├── MonorepoBuildReleasePlugin.kt   # plugin entry point
+│   │   │   ├── build/                           # change detection
+│   │   │   ├── release/                         # versioned tagging
+│   │   │   └── git/                             # shared git utilities
 │   │   └── test/
 │   │       ├── unit/kotlin/           # Unit tests
 │   │       ├── integration/kotlin/    # Integration tests (real git, no TestKit)
@@ -52,11 +53,12 @@ monorepo-gradle-plugins/
 
 The plugin consists of several key components:
 
-1. **MonorepoBuildPlugin** - Main plugin class that registers tasks and extensions
-2. **MonorepoBuildExtension** - Configuration DSL and results storage
-3. **GitChangedFilesDetector** - Detects changed files using git commands
-4. **ProjectFileMapper** - Maps changed files to Gradle projects
-5. **ChangedProjects** - Domain object for convenient access to change information
+1. **MonorepoBuildReleasePlugin** (`monorepo`) - Plugin entry point; registers all tasks and extensions
+2. **MonorepoBuildExtension** (`monorepo.build`) - Configuration DSL and results storage for change detection
+3. **MonorepoReleaseExtension** (`monorepo.release`) - Configuration DSL for release/versioning
+4. **GitChangedFilesDetector** (`monorepo.build.git`) - Detects changed files using git commands
+5. **ProjectFileMapper** (`monorepo.build.domain`) - Maps changed files to Gradle projects
+6. **GitCommandExecutor** (`monorepo.git`) - Shared low-level git command runner
 
 ## Building the Plugin
 

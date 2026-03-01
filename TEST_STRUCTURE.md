@@ -8,26 +8,26 @@ This project uses separate source sets for different types of tests.
 monorepo-build-release-plugin/src/test/
 ├── unit/
 │   └── kotlin/
-│       └── io/github/doughawley/
-│           ├── monorepobuild/       # Build plugin unit tests
-│           ├── monoreporelease/     # Release plugin unit tests
-│           └── monorepocore/       # GitCommandExecutor tests
+│       └── io/github/doughawley/monorepo/
+│           ├── build/       # Change detection unit tests
+│           ├── release/     # Release/versioning unit tests
+│           └── git/         # GitCommandExecutor tests
 ├── integration/
 │   └── kotlin/
-│       └── io/github/doughawley/monoreporelease/
+│       └── io/github/doughawley/monorepo/release/git/
 │           └── ... (integration tests against a real git backend)
 └── functional/
     └── kotlin/
-        └── io/github/doughawley/
-            ├── monorepobuild/       # Build plugin functional tests
-            └── monoreporelease/     # Release plugin functional tests
+        └── io/github/doughawley/monorepo/
+            ├── build/       # Change detection functional tests
+            └── release/     # Release functional tests
 ```
 
 ## Test Types
 
 ### Unit Tests (`src/test/unit/`)
 Unit tests focus on testing individual components in isolation:
-- Domain model tests (ProjectMetadata, ChangedProjects)
+- Domain model tests (ProjectMetadata, MonorepoProjects)
 - Service/utility class tests
 - Fast execution
 - No external dependencies
@@ -46,7 +46,7 @@ Functional tests verify end-to-end functionality:
 - Tests real-world scenarios with actual git operations
 
 **Current Functional Tests:**
-- `MonorepoPluginFunctionalTest.kt` - Tests the `printChangedProjectsFromBranch` task
+- `MonorepoPluginDetectionFunctionalTest.kt` - Tests the `printChangedProjectsFromBranch` task
 - `BuildChangedProjectsFunctionalTest.kt` - Tests the `buildChangedProjectsFromBranch` task
 - `MonorepoPluginConfigurationTest.kt` - Configuration and exclude pattern scenarios
 - `PrintChangedProjectsFromRefFunctionalTest.kt` - Tests the ref-mode task
@@ -94,26 +94,25 @@ Integration tests run after unit tests; functional tests run last when using `ch
 ### Adding a Unit Test
 Create your test file under the appropriate package in:
 ```
-monorepo-build-release-plugin/src/test/unit/kotlin/io/github/doughawley/
+monorepo-build-release-plugin/src/test/unit/kotlin/io/github/doughawley/monorepo/
 ```
 
 ### Adding an Integration Test
 Create your test file under the appropriate package in:
 ```
-monorepo-build-release-plugin/src/test/integration/kotlin/io/github/doughawley/
+monorepo-build-release-plugin/src/test/integration/kotlin/io/github/doughawley/monorepo/
 ```
 
 ### Adding a Functional Test
 Create your test file under the appropriate package in:
 ```
-monorepo-build-release-plugin/src/test/functional/kotlin/io/github/doughawley/
+monorepo-build-release-plugin/src/test/functional/kotlin/io/github/doughawley/monorepo/
 ```
 
 ## Test Configuration
 
-Both test types:
+All test types:
 - Use JUnit Platform (Kotest)
-- Use the same test dependencies
 - Run with `outputs.upToDateWhen { false }` to always execute
 - Have access to main source set output
 
