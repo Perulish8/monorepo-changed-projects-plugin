@@ -138,7 +138,7 @@ An empty file is written when nothing has changed, so downstream scripts can alw
 **Override the output path permanently in the build script:**
 
 ```kotlin
-tasks.named<io.github.doughawley.monorepobuild.WriteChangedProjectsFromRefTask>(
+tasks.named<io.github.doughawley.monorepo.build.task.WriteChangedProjectsFromRefTask>(
     "writeChangedProjectsFromRef"
 ) {
     outputFile.set(layout.projectDirectory.file("ci/changed-projects.txt"))
@@ -153,7 +153,7 @@ The plugin computes results during the configuration phase, so any task can acce
 tasks.register("customTask") {
     doLast {
         val extension = project.extensions.getByType(
-            io.github.doughawley.monorepobuild.MonorepoBuildExtension::class.java
+            io.github.doughawley.monorepo.build.MonorepoBuildExtension::class.java
         )
         val changedProjects = extension.allAffectedProjects
         println("Changed projects: $changedProjects")

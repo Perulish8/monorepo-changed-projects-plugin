@@ -177,17 +177,17 @@ if (exitCode == 0) {
 
 ### Running Tests
 ```bash
-./gradlew :monorepo-build-release-plugin:check
+./gradlew check
 ```
 
 ### Building the Plugin
 ```bash
-./gradlew :monorepo-build-release-plugin:build
+./gradlew build
 ```
 
 ### Publishing Locally
 ```bash
-./gradlew :monorepo-build-release-plugin:publishToMavenLocal
+./gradlew publishToMavenLocal
 ```
 
 ## CI/CD
@@ -227,7 +227,7 @@ GitHub Actions workflows are configured in `.github/workflows/`:
 ## Code Review Checklist
 
 Before submitting changes, verify:
-- [ ] All tests pass (`./gradlew :monorepo-build-release-plugin:check`)
+- [ ] All tests pass (`./gradlew check`)
 - [ ] Code compiles without warnings
 - [ ] New features have Kotest tests
 - [ ] Public APIs have KDoc comments
