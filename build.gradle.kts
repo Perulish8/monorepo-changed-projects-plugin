@@ -117,8 +117,8 @@ tasks.withType<Test>().configureEach {
 }
 
 gradlePlugin {
-    website.set("https://github.com/doug-hawley/monorepo-gradle-plugins")
-    vcsUrl.set("https://github.com/doug-hawley/monorepo-gradle-plugins.git")
+    website.set("https://github.com/doug-hawley/monorepo-build-release-plugin")
+    vcsUrl.set("https://github.com/doug-hawley/monorepo-build-release-plugin.git")
 
     plugins {
         register("monorepoBuildReleasePlugin") {

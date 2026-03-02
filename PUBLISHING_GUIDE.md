@@ -36,7 +36,7 @@ Your plugin is now configured and ready to publish! Here's what's already in pla
 
 ### Step 2: Add GitHub Secrets
 
-1. Go to your GitHub repository: https://github.com/doug-hawley/monorepo-gradle-plugins
+1. Go to your GitHub repository: https://github.com/doug-hawley/monorepo-build-release-plugin
 2. Navigate to: **Settings** → **Secrets and variables** → **Actions**
 3. Click **New repository secret**
 4. Add two secrets:

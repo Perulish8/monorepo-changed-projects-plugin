@@ -15,7 +15,7 @@ This uses your GitHub username (`doug-hawley`) and follows the recommended `io.g
 The Gradle Plugin Portal requires public repositories.
 
 **Steps:**
-1. Go to: https://github.com/doug-hawley/monorepo-gradle-plugins/settings
+1. Go to: https://github.com/doug-hawley/monorepo-build-release-plugin/settings
 2. Scroll down to **"Danger Zone"** at the bottom
 3. Click **"Change visibility"**
 4. Select **"Make public"**
@@ -45,7 +45,7 @@ This proves you own the GitHub username `doug-hawley`.
 Before resubmitting, verify:
 
 ### Repository
-- [ ] Repository is **public** (https://github.com/doug-hawley/monorepo-gradle-plugins)
+- [ ] Repository is **public** (https://github.com/doug-hawley/monorepo-build-release-plugin)
 - [ ] Repository has a README with usage instructions
 - [ ] Repository has a LICENSE file
 - [ ] VCS URL in build.gradle.kts is correct

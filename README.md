@@ -1,6 +1,6 @@
 # Monorepo Build Plugin
 
-[![CI](https://github.com/doug-hawley/monorepo-gradle-plugins/actions/workflows/ci.yml/badge.svg)](https://github.com/doug-hawley/monorepo-gradle-plugins/actions/workflows/ci.yml)
+[![CI](https://github.com/doug-hawley/monorepo-build-release-plugin/actions/workflows/ci.yml/badge.svg)](https://github.com/doug-hawley/monorepo-build-release-plugin/actions/workflows/ci.yml)
 
 A Gradle plugin designed to optimize build times in large multi-module Gradle projects and monorepos by detecting which projects have changed based on git history.
 
@@ -228,9 +228,9 @@ This is expected if files in the root directory (outside of subproject directori
 
 ## Support & Contributions
 
-- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/doug-hawley/monorepo-gradle-plugins/issues)
+- **Issues**: Report bugs or request features via [GitHub Issues](https://github.com/doug-hawley/monorepo-build-release-plugin/issues)
 - **Contributing**: See [CONTRIBUTING.md](CONTRIBUTING.md) for development setup and guidelines
-- **Questions**: Start a discussion in [GitHub Discussions](https://github.com/doug-hawley/monorepo-gradle-plugins/discussions)
+- **Questions**: Start a discussion in [GitHub Discussions](https://github.com/doug-hawley/monorepo-build-release-plugin/discussions)
 
 ## License
 
