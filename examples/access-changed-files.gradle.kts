@@ -17,7 +17,7 @@ monorepoBuild {
 tasks.register("listChangedProjects") {
     doLast {
         val extension = project.extensions.getByType(
-            io.github.doughawley.monorepobuild.MonorepoBuildExtension::class.java
+            io.github.doughawley.monorepo.build.MonorepoBuildExtension::class.java
         )
         println("Changed projects: ${extension.allAffectedProjects.joinToString(", ")}")
     }
@@ -27,7 +27,7 @@ tasks.register("listChangedProjects") {
 tasks.register("listChangedFiles") {
     doLast {
         val extension = project.extensions.getByType(
-            io.github.doughawley.monorepobuild.MonorepoBuildExtension::class.java
+            io.github.doughawley.monorepo.build.MonorepoBuildExtension::class.java
         )
 
         println("Changed files by project:")
@@ -44,7 +44,7 @@ tasks.register("listChangedFiles") {
 tasks.register("analyzeChanges") {
     doLast {
         val extension = project.extensions.getByType(
-            io.github.doughawley.monorepobuild.MonorepoBuildExtension::class.java
+            io.github.doughawley.monorepo.build.MonorepoBuildExtension::class.java
         )
 
         println("Detailed change analysis:")
@@ -68,7 +68,7 @@ tasks.register("analyzeChanges") {
 tasks.register("smartBuild") {
     doLast {
         val extension = project.extensions.getByType(
-            io.github.doughawley.monorepobuild.MonorepoBuildExtension::class.java
+            io.github.doughawley.monorepo.build.MonorepoBuildExtension::class.java
         )
 
         extension.changedFilesMap.forEach { (projectPath, files) ->
@@ -97,7 +97,7 @@ tasks.register("smartBuild") {
 tasks.register("impactReport") {
     doLast {
         val extension = project.extensions.getByType(
-            io.github.doughawley.monorepobuild.MonorepoBuildExtension::class.java
+            io.github.doughawley.monorepo.build.MonorepoBuildExtension::class.java
         )
 
         val report = StringBuilder()

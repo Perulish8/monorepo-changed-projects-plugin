@@ -120,7 +120,6 @@ This project uses [Kotest](https://kotest.io/) for testing with separate unit an
 
 For more information on testing, see:
 - [TEST_STRUCTURE.md](TEST_STRUCTURE.md)
-- [FUNCTIONAL_TESTS_GUIDE.md](FUNCTIONAL_TESTS_GUIDE.md)
 
 ## Code Style
 
