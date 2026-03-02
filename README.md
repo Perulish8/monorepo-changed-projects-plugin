@@ -117,36 +117,6 @@ An empty file is written when nothing has changed, so downstream scripts can alw
   -PmonorepoBuild.outputFile=ci/changed-projects.txt
 ```
 
-**Override the output path permanently in the build script:**
-
-```kotlin
-tasks.named<io.github.doughawley.monorepo.build.task.WriteChangedProjectsFromRefTask>(
-    "writeChangedProjectsFromRef"
-) {
-    outputFile.set(layout.projectDirectory.file("ci/changed-projects.txt"))
-}
-```
-
-#### Access changed projects in other tasks
-
-The plugin computes results during the configuration phase, so any task can access them directly from the `monorepoBuild` extension — no `dependsOn` needed:
-
-```kotlin
-tasks.register("customTask") {
-    doLast {
-        val extension = project.extensions.getByType(
-            io.github.doughawley.monorepo.build.MonorepoBuildExtension::class.java
-        )
-        val changedProjects = extension.allAffectedProjects
-        println("Changed projects: $changedProjects")
-
-        changedProjects.forEach { projectPath ->
-            println("Affected: $projectPath")
-        }
-    }
-}
-```
-
 ### Releases
 
 Each subproject manages its own semantic version using git tags of the form `{globalTagPrefix}/{projectPrefix}/v{version}` (e.g. `release/api/v1.2.0`). Release is opt-in per subproject.
@@ -211,6 +181,38 @@ Override the version bump scope (primary branch only):
 - Releases from the primary branch bump using `primaryBranchScope` (default `minor`)
 - Releases from a release branch (`release/api/v1.2.x`) always apply a `patch` bump
 - The subproject must be built before releasing — `release` requires `build` to have run
+
+### Advanced
+
+#### Access changed projects in other tasks
+
+The plugin computes results during the configuration phase, so any task can access them directly from the `monorepoBuild` extension — no `dependsOn` needed:
+
+```kotlin
+tasks.register("customTask") {
+    doLast {
+        val extension = project.extensions.getByType(
+            io.github.doughawley.monorepo.build.MonorepoBuildExtension::class.java
+        )
+        val changedProjects = extension.allAffectedProjects
+        println("Changed projects: $changedProjects")
+
+        changedProjects.forEach { projectPath ->
+            println("Affected: $projectPath")
+        }
+    }
+}
+```
+
+#### Override the `writeChangedProjectsFromRef` output path
+
+```kotlin
+tasks.named<io.github.doughawley.monorepo.build.task.WriteChangedProjectsFromRefTask>(
+    "writeChangedProjectsFromRef"
+) {
+    outputFile.set(layout.projectDirectory.file("ci/changed-projects.txt"))
+}
+```
 
 ## Configuration Reference
 
