@@ -158,7 +158,7 @@ grep -r "io.github.doug-hawley" build.gradle.kts
 ./gradlew clean build
 
 # Check generated plugin descriptor
-cat monorepo-build-release-plugin/build/pluginDescriptors/io.github.doug-hawley.monorepo-build-release-plugin.properties
+cat build/pluginDescriptors/io.github.doug-hawley.monorepo-build-release-plugin.properties
 ```
 
 ---

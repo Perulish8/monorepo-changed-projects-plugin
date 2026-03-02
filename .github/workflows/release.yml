@@ -42,10 +42,10 @@ jobs:
           echo "Releasing version: $VERSION"
 
       - name: Build plugin
-        run: ./gradlew :monorepo-build-release-plugin:build --no-daemon --stacktrace
+        run: ./gradlew build --no-daemon --stacktrace
 
       - name: Run all tests
-        run: ./gradlew :monorepo-build-release-plugin:check --no-daemon --stacktrace
+        run: ./gradlew check --no-daemon --stacktrace
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
@@ -55,7 +55,7 @@ jobs:
           draft: false
           prerelease: false
           files: |
-            monorepo-build-release-plugin/build/libs/*.jar
+            build/libs/*.jar
             CHANGELOG.md
           body: |
             ## Changes in version ${{ steps.get_version.outputs.VERSION }}
@@ -94,4 +94,4 @@ jobs:
         env:
           GRADLE_PUBLISH_KEY: ${{ secrets.GRADLE_PUBLISH_KEY }}
           GRADLE_PUBLISH_SECRET: ${{ secrets.GRADLE_PUBLISH_SECRET }}
-        run: ./gradlew :monorepo-build-release-plugin:publishPlugins --no-daemon --stacktrace
+        run: ./gradlew publishPlugins --no-daemon --stacktrace
