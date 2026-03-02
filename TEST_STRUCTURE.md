@@ -5,7 +5,7 @@ This project uses separate source sets for different types of tests.
 ## Directory Structure
 
 ```
-monorepo-build-release-plugin/src/test/
+src/test/
 ├── unit/
 │   └── kotlin/
 │       └── io/github/doughawley/monorepo/
@@ -67,23 +67,23 @@ Functional tests verify end-to-end functionality:
 
 ### Run All Tests
 ```bash
-./gradlew :monorepo-build-release-plugin:check
+./gradlew check
 ```
 This runs unit, integration, and functional tests in order.
 
 ### Run Only Unit Tests
 ```bash
-./gradlew :monorepo-build-release-plugin:unitTest
+./gradlew unitTest
 ```
 
 ### Run Only Integration Tests
 ```bash
-./gradlew :monorepo-build-release-plugin:integrationTest
+./gradlew integrationTest
 ```
 
 ### Run Only Functional Tests
 ```bash
-./gradlew :monorepo-build-release-plugin:functionalTest
+./gradlew functionalTest
 ```
 
 ### Run Tests in Specific Order
@@ -94,19 +94,19 @@ Integration tests run after unit tests; functional tests run last when using `ch
 ### Adding a Unit Test
 Create your test file under the appropriate package in:
 ```
-monorepo-build-release-plugin/src/test/unit/kotlin/io/github/doughawley/monorepo/
+src/test/unit/kotlin/io/github/doughawley/monorepo/
 ```
 
 ### Adding an Integration Test
 Create your test file under the appropriate package in:
 ```
-monorepo-build-release-plugin/src/test/integration/kotlin/io/github/doughawley/monorepo/
+src/test/integration/kotlin/io/github/doughawley/monorepo/
 ```
 
 ### Adding a Functional Test
 Create your test file under the appropriate package in:
 ```
-monorepo-build-release-plugin/src/test/functional/kotlin/io/github/doughawley/monorepo/
+src/test/functional/kotlin/io/github/doughawley/monorepo/
 ```
 
 ## Test Configuration
