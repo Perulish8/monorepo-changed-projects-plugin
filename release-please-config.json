@@ -2,7 +2,7 @@
   "release-type": "simple",
   "packages": {
     ".": {
-      "package-name": "monorepo-gradle-plugins",
+      "package-name": "monorepo-build-release-plugin",
       "changelog-path": "CHANGELOG.md",
       "bump-minor-pre-major": true,
       "bump-patch-for-minor-pre-major": true,

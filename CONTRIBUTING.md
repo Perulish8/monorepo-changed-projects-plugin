@@ -24,26 +24,24 @@ Thank you for your interest in contributing! This document provides guidelines a
 ### Clone the Repository
 
 ```bash
-git clone https://github.com/doug-hawley/monorepo-gradle-plugins.git
-cd monorepo-gradle-plugins
+git clone https://github.com/doug-hawley/monorepo-build-release-plugin.git
+cd monorepo-build-release-plugin
 ```
 
 ### Project Structure
 
 ```
-monorepo-gradle-plugins/
+monorepo-build-release-plugin/   ← repo root
 ├── src/
-│   ├── src/
-│   │   ├── main/kotlin/io/github/doughawley/monorepo/
-│   │   │   ├── MonorepoBuildReleasePlugin.kt   # plugin entry point
-│   │   │   ├── build/                           # change detection
-│   │   │   ├── release/                         # versioned tagging
-│   │   │   └── git/                             # shared git utilities
-│   │   └── test/
-│   │       ├── unit/kotlin/           # Unit tests
-│   │       ├── integration/kotlin/    # Integration tests (real git, no TestKit)
-│   │       └── functional/kotlin/    # Functional tests with Gradle TestKit
-│   └── build.gradle.kts
+│   ├── main/kotlin/io/github/doughawley/monorepo/
+│   │   ├── MonorepoBuildReleasePlugin.kt   # plugin entry point
+│   │   ├── build/                           # change detection
+│   │   ├── release/                         # versioned tagging
+│   │   └── git/                             # shared git utilities
+│   └── test/
+│       ├── unit/kotlin/           # Unit tests
+│       ├── integration/kotlin/    # Integration tests (real git, no TestKit)
+│       └── functional/kotlin/     # Functional tests with Gradle TestKit
 ├── build.gradle.kts
 ├── settings.gradle.kts
 └── gradle.properties
@@ -371,8 +369,8 @@ git diff --staged --name-only
 
 ## Need Help?
 
-- **Questions**: Open a [GitHub Discussion](https://github.com/doug-hawley/monorepo-gradle-plugins/discussions)
-- **Bugs**: Report via [GitHub Issues](https://github.com/doug-hawley/monorepo-gradle-plugins/issues)
+- **Questions**: Open a [GitHub Discussion](https://github.com/doug-hawley/monorepo-build-release-plugin/discussions)
+- **Bugs**: Report via [GitHub Issues](https://github.com/doug-hawley/monorepo-build-release-plugin/issues)
 
 ## License
 
